@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "appelent-recipes"
+  },
+  "targets": {
+    "appelent-recipes": {
+      "hosting": {
+        "stg": [
+          "appelent-recipes-stg"
+        ],
+        "prd": [
+          "appelent-recipes"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

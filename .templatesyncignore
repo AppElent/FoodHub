@@ -1,0 +1,6 @@
+firebase.json
+.firebaserc
+readme.md
+package-lock.json
+
+src/config
