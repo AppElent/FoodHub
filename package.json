@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:fix": "npm run lint-fix && tsc -b && vite build",
     "tsc": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -14,14 +15,15 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,mdx}\" --cache",
     "deploy:stg": "npm run lint-fix && npm run build && firebase deploy --only hosting:stg",
     "deploy:stg:skipchecks": "npm run build && firebase deploy --only hosting:stg",
+    "deploy:stg:skipbuild": "firebase deploy --only hosting:stg",
     "deploy:prd": "npm run lint-fix && npm run build && firebase deploy --only hosting:prd",
     "deploy:prd:skipchecks": "npm run build && firebase deploy --only hosting:prd",
+    "deploy:prd:skipbuild": "firebase deploy --only hosting:prd",
     "check-updates": "npx npm-check-updates -i",
     "docs": "jsdoc -c jsdoc.conf.json",
     "npm-check": "npm-check"
   },
   "dependencies": {
-    "@andypf/json-viewer": "^2.1.7",
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^9.2.0",
     "@hello-pangea/dnd": "^17.0.0",
@@ -38,7 +40,6 @@
     "material-ui-confirm": "^3.0.16",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
-    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
     "react-easy-crop": "^5.1.0",
     "react-helmet-async": "^2.0.5",

@@ -5,7 +5,7 @@ import Tabs from './tabs';
 export interface TabData {
   label: string;
   value: string;
-  component: JSX.Element;
+  component?: JSX.Element;
 }
 
 // Context to share current tab information

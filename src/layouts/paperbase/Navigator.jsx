@@ -1,5 +1,7 @@
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
 import HomeIcon from '@mui/icons-material/Home';
+import LockIcon from '@mui/icons-material/Lock';
 import PeopleIcon from '@mui/icons-material/People';
 import PhonelinkSetupIcon from '@mui/icons-material/PhonelinkSetup';
 import PermMediaOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActual';
@@ -21,6 +23,9 @@ import ListItemText from '@mui/material/ListItemText';
 import config from '@/config';
 import { getPath, menu } from '@/config/paths';
 import useRouter from '@/hooks/use-router';
+import { useAuth } from '@/libs/auth';
+import { Collapse } from '@mui/material';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const categories = [
@@ -68,9 +73,19 @@ const itemCategory = {
 };
 
 export default function Navigator(props) {
+  const auth = useAuth();
+  console.log(auth);
+  const handleClick = (id) => {
+    setOpen((prevOpen) => ({ ...prevOpen, [id]: !prevOpen[id] }));
+  };
   const { closeDrawer, ...other } = props;
   const router = useRouter();
   const mainItems = menu || categories;
+  // default value in mainItems[].collapsed
+  const [open, setOpen] = useState(
+    mainItems.reduce((acc, { id, collapsed }) => ({ ...acc, [id]: collapsed ?? false }), {})
+  );
+
   const title = config?.meta?.title;
   const { t } = useTranslation();
 
@@ -102,43 +117,58 @@ export default function Navigator(props) {
             <ListItemText>Home</ListItemText>
           </ListItemButton>
         </ListItem>
-        {mainItems.map(({ id, label, translationKey, children }) => (
+        {mainItems.map(({ id, label, translationKey, children, collapsed }) => (
           <Box
             key={id}
             sx={{ bgcolor: '#101F33' }}
           >
-            <ListItem sx={{ py: 2, px: 3 }}>
+            <ListItemButton
+              sx={{ py: 2, px: 3 }}
+              // button
+              onClick={() => handleClick(id)}
+            >
               <ListItemText sx={{ color: '#fff' }}>
                 {translationKey ? t(translationKey, { defaultValue: label }) : label}
               </ListItemText>
-            </ListItem>
-            {children.map(
-              ({
-                id: childId,
-                label: childLabel,
-                translationKey: childTranslationKey,
-                to,
-                Icon,
-              }) => (
-                <ListItem
-                  disablePadding
-                  key={childId}
-                >
-                  <ListItemButton
-                    selected={to === window.location.pathname}
-                    onClick={() => onLinkClick(to || '/')}
-                    sx={item}
+              {open[id] ? <ExpandLess color="primary" /> : <ExpandMore color="primary" />}
+            </ListItemButton>
+            <Collapse
+              in={!open[id]}
+              timeout="auto"
+              unmountOnExit
+            >
+              {children.map(
+                ({
+                  id: childId,
+                  label: childLabel,
+                  translationKey: childTranslationKey,
+                  to,
+                  loginRequired,
+                  Icon,
+                }) => (
+                  <ListItem
+                    disablePadding
+                    key={childId}
                   >
-                    <ListItemIcon>{Icon}</ListItemIcon>
-                    <ListItemText>
-                      {childTranslationKey
-                        ? t(childTranslationKey, { defaultValue: childLabel })
-                        : childLabel}
-                    </ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              )
-            )}
+                    <ListItemButton
+                      selected={to === window.location.pathname}
+                      onClick={() => onLinkClick(to || '/')}
+                      sx={item}
+                    >
+                      <ListItemIcon>{Icon}</ListItemIcon>
+                      <ListItemText>
+                        {childTranslationKey
+                          ? t(childTranslationKey, { defaultValue: childLabel })
+                          : childLabel}
+                      </ListItemText>
+                      {loginRequired && !auth.isAuthenticated && (
+                        <LockIcon sx={{ color: '#bbb', fontSize: 18, ml: 1 }} />
+                      )}
+                    </ListItemButton>
+                  </ListItem>
+                )
+              )}
+            </Collapse>
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}

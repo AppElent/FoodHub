@@ -2,8 +2,14 @@ import { faker } from '@faker-js/faker';
 import * as yup from 'yup';
 import { DataSourceInitOptions, FilterObject } from '..';
 
-interface validateOptions {
-  full: boolean;
+interface validateOptions extends yup.ValidateOptions {
+  full?: boolean;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  errors?: Record<string, string[]>;
+  values: any;
 }
 
 /**
@@ -36,72 +42,72 @@ class BaseDataSource<T> {
     };
   }
 
-  /**
-   * Helper function to validate email format.
-   * @param {string} email - The email to validate.
-   * @returns {boolean} - True if the email is valid, false otherwise.
-   */
-  #isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  // /**
+  //  * Helper function to validate email format.
+  //  * @param {string} email - The email to validate.
+  //  * @returns {boolean} - True if the email is valid, false otherwise.
+  //  */
+  // #isValidEmail = (email: string): boolean => {
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   return emailRegex.test(email);
+  // };
+
+  // /**
+  //  * Helper function to validate date format.
+  //  * @param {string} date - The date to validate.
+  //  * @returns {boolean} - True if the date is valid, false otherwise.
+  //  */
+  // #isValidDate = (date: string): boolean => {
+  //   return !isNaN(new Date(date).getTime());
+  // };
 
   /**
-   * Helper function to validate date format.
-   * @param {string} date - The date to validate.
-   * @returns {boolean} - True if the date is valid, false otherwise.
-   */
-  #isValidDate = (date: string): boolean => {
-    return !isNaN(new Date(date).getTime());
-  };
+  //  * Validates the data against the schema.
+  //  * @param {Partial<T>} data - The data to validate.
+  //  * @param {validateOptions} [_options] - Additional validation options.
+  //  * @throws Will throw an error if validation fails.
+  //  */
+  // #validateSchema = async (data: Partial<T>, _options?: validateOptions): Promise<void> => {
+  //   if (this.options.schema) {
+  //     const errors = [];
+  //     for (const [key, rules] of Object.entries(this.options.schema)) {
+  //       const value = (data as { [key: string]: any })[key];
 
-  /**
-   * Validates the data against the schema.
-   * @param {Partial<T>} data - The data to validate.
-   * @param {validateOptions} [_options] - Additional validation options.
-   * @throws Will throw an error if validation fails.
-   */
-  #validateSchema = async (data: Partial<T>, _options?: validateOptions): Promise<void> => {
-    if (this.options.schema) {
-      const errors = [];
-      for (const [key, rules] of Object.entries(this.options.schema)) {
-        const value = (data as { [key: string]: any })[key];
+  //       // Check required fields
+  //       if (rules.required && (value === undefined || value === null)) {
+  //         errors.push(`${key} is required.`);
+  //         continue;
+  //       }
 
-        // Check required fields
-        if (rules.required && (value === undefined || value === null)) {
-          errors.push(`${key} is required.`);
-          continue;
-        }
+  //       // Check data type
+  //       if (rules.type) {
+  //         switch (rules.type) {
+  //           case 'string':
+  //             if (typeof value !== 'string') errors.push(`${key} must be a string.`);
+  //             break;
+  //           case 'number':
+  //             if (typeof value !== 'number') errors.push(`${key} must be a number.`);
+  //             break;
+  //           case 'boolean':
+  //             if (typeof value !== 'boolean') errors.push(`${key} must be a boolean.`);
+  //             break;
+  //           case 'date':
+  //             if (!this.#isValidDate(value)) errors.push(`${key} must be a valid date.`);
+  //             break;
+  //           case 'email':
+  //             if (!this.#isValidEmail(value)) errors.push(`${key} must be a valid email.`);
+  //             break;
+  //           default:
+  //             break;
+  //         }
+  //       }
+  //     }
 
-        // Check data type
-        if (rules.type) {
-          switch (rules.type) {
-            case 'string':
-              if (typeof value !== 'string') errors.push(`${key} must be a string.`);
-              break;
-            case 'number':
-              if (typeof value !== 'number') errors.push(`${key} must be a number.`);
-              break;
-            case 'boolean':
-              if (typeof value !== 'boolean') errors.push(`${key} must be a boolean.`);
-              break;
-            case 'date':
-              if (!this.#isValidDate(value)) errors.push(`${key} must be a valid date.`);
-              break;
-            case 'email':
-              if (!this.#isValidEmail(value)) errors.push(`${key} must be a valid email.`);
-              break;
-            default:
-              break;
-          }
-        }
-      }
-
-      if (errors.length > 0) {
-        throw new Error(errors.join(' '));
-      }
-    }
-  };
+  //     if (errors.length > 0) {
+  //       throw new Error(errors.join(' '));
+  //     }
+  //   }
+  // };
 
   /**
    * Validates the data against the Yup schema.
@@ -109,15 +115,50 @@ class BaseDataSource<T> {
    * @param {validateOptions} [_options] - Additional validation options.
    * @throws Will throw an error if validation fails.
    */
-  #validateYupSchema = async (data: Partial<T>, _options?: validateOptions): Promise<void> => {
+  #validateYupSchema = async (
+    data: Partial<T>,
+    options?: validateOptions
+  ): Promise<ValidationResult> => {
+    const combinedOptions = { full: false, abortEarly: false, ...options };
+    const returnObject: ValidationResult = {
+      valid: true,
+      errors: undefined,
+      values: data,
+    };
     if (this.options.YupValidationSchema) {
       try {
-        await this.options.YupValidationSchema.validate(data, { abortEarly: false });
-      } catch (err: any) {
-        const validationErrors = err.errors?.join(' ');
-        throw new Error(`Validation failed: ${validationErrors}`);
+        const validationSchema = options?.full
+          ? this.options.YupValidationSchema
+          : (this.options.YupValidationSchema as yup.ObjectSchema<any>).pick(
+              Object.keys(data) as (keyof typeof this.options.YupValidationSchema)[]
+            );
+        //await this.options.YupValidationSchema.validate(data, { abortEarly: false });
+        await validationSchema.validate(data, combinedOptions);
+      } catch (error: any) {
+        if (error instanceof yup.ValidationError) {
+          // Collect multiple errors for each path
+          const errorMessages = error.inner.reduce((acc: Record<string, string[]>, err) => {
+            if (err.path && !acc[err.path]) {
+              acc[err.path] = [];
+            }
+            if (err.path) {
+              acc[err.path].push(err.message);
+            }
+            return acc;
+          }, {});
+          console.error('Validation error', errorMessages);
+          returnObject.valid = false;
+          returnObject.errors = errorMessages;
+          console.error('Validation error:', returnObject);
+        } else {
+          console.error('Unexpected error:', error);
+          throw error;
+        }
+      } finally {
+        console.log('VALIDATION', returnObject);
       }
     }
+    return returnObject;
   };
 
   /**
@@ -126,9 +167,9 @@ class BaseDataSource<T> {
    * @param {validateOptions} [options] - Additional validation options.
    * @throws Will throw an error if validation fails.
    */
-  validate = async (data: Partial<T>, options?: validateOptions): Promise<void> => {
-    await this.#validateSchema(data, options);
-    await this.#validateYupSchema(data, options);
+  validate = async (data: Partial<T>, options?: validateOptions): Promise<ValidationResult> => {
+    //await this.#validateSchema(data, options);
+    return await this.#validateYupSchema(data, options);
   };
 
   /**

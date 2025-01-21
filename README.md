@@ -19,22 +19,6 @@ npm create vite@latest
 - vite.config:
   - @-root
 - prettier.config - add
-- Packages:
-  - react-router-dom
-  - prop-types
-  - @mui/material
-  - @mui/icons-material
-  - @emotion/styled
-  - react-helmet-async
-  - firebase
-  - formik
-  - yup
-  - @andypf/json-viewer
-  - material-ui-confirm
-  - use-query-params
-  - react-easy-crop
-- Devpackages:
-  - prettier
 
 3. main.tsx: HelmerProvider & BrowserRouter
 4. App: Dashboard
@@ -122,4 +106,24 @@ Default dependencies:
     "vite": "^5.4.9"
   }
 
+```
+
+## Actions after starting template:
+
+- Change title on HTML page
+- Change package.json properties
+- Change config folder
+  Firebase configuration:
+
+```
+firebase init
+# hosting
+# public dir: dist
+
+# create sites if needed
+firebase hosting:sites:list
+firebase hosting:sites:create appelent-stg
+# Add targets
+firebase target:apply hosting stg appelent-stg
+firebase target:apply hosting prd appelent
 ```

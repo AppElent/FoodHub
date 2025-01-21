@@ -6,7 +6,7 @@ export interface FieldConfig {
   label?: string;
   translationKey?: string;
   type?: string; // TODO: limit types
-  options?: any[];
+  options?: any[]; // TODO: set type to string[] OR { key: string, value: any }[]
   definition?: string;
   initialValue?: any;
   //render?: (config: FieldDefinitionConfig) => any;
@@ -19,12 +19,45 @@ type MuiProps = {
   [key: `mui${string}Props`]: any;
 };
 
+interface TableProps {
+  // columns?: {
+  //   config: FieldConfig;
+  //   label: string;
+  //   key: string;
+  //   render?: (value: any) => any;
+  //   defaultValue?: any;
+  //   type?:
+  //     | 'text'
+  //     | 'number'
+  //     | 'date'
+  //     | 'datetime'
+  //     | 'time'
+  //     | 'currency'
+  //     | 'select'
+  //     | 'boolean'
+  //     | 'autocomplete';
+  //   options?: {
+  //     key: string;
+  //     value: any;
+  //   }[];
+  //   fieldDefinition?: FieldConfig;
+  // }[];
+  columns: {
+    [key: string]: FieldConfig;
+  };
+  editable?: boolean;
+  selectable?: boolean;
+  reorderable?: boolean;
+  title?: string;
+}
+
 export interface FieldOptions extends MuiProps {
   muiTextFieldProps?: TextFieldProps;
   muiAutoCompleteProps?: AutocompleteProps<any, any, any, any>;
   editMode?: boolean;
   debounce?: number;
-  [key: string]: any;
+  table?: TableProps;
+  [key: string]: any; //TODO: remove wildcard
 }
 
 export { default as CustomForm } from './custom-form';

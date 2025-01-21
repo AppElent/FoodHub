@@ -63,9 +63,6 @@ function Header(props) {
               item
               xs
             />
-            {/* <Grid item>
-              <VersionSelector />
-            </Grid> */}
             <Grid item>
               <IssueDialog />
             </Grid>

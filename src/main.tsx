@@ -5,12 +5,21 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
 
+// const router = createBrowserRouter(routes);
+
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <HelmetProvider>
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_relativeSplatPath: true,
+        v7_startTransition: true,
+      }}
+    >
       <App />
     </BrowserRouter>
+    {/* <RouterProvider router={router} /> */}
+    {/* <App /> */}
   </HelmetProvider>
   // </StrictMode>,
 );

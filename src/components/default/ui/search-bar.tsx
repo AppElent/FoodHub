@@ -1,4 +1,4 @@
-import { IconButton, InputAdornment, OutlinedInput } from '@mui/material';
+import { IconButton, InputAdornment, OutlinedInput, OutlinedInputProps } from '@mui/material';
 
 import ClearIcon from '@mui/icons-material/Clear';
 
@@ -6,14 +6,19 @@ interface SearchBarProps {
   onClear: () => void;
   value: any;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder: string;
-  props?: Partial<React.ComponentProps<typeof OutlinedInput>>;
+  placeholder?: string;
+  muiOutlinedInputProps?: OutlinedInputProps;
 }
 
-const SearchBar = ({ onClear, value, onChange, placeholder, props }: SearchBarProps) => {
+const SearchBar = ({
+  onClear,
+  value,
+  onChange,
+  placeholder,
+  muiOutlinedInputProps,
+}: SearchBarProps) => {
   return (
     <OutlinedInput
-      placeholder={placeholder}
       // startAdornment={
       //   <InputAdornment position="start">
       //     <SvgIcon>{/* <SearchMdIcon /> */}</SvgIcon>
@@ -35,7 +40,8 @@ const SearchBar = ({ onClear, value, onChange, placeholder, props }: SearchBarPr
       value={value || ''}
       sx={{ flexGrow: 1 }}
       onChange={onChange}
-      {...props}
+      {...muiOutlinedInputProps}
+      placeholder={placeholder || 'Search'}
     />
   );
 };

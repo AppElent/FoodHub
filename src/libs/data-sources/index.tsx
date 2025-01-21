@@ -3,6 +3,8 @@ import * as Yup from 'yup';
 import DataProvider, { DataContext } from './DataProvider';
 import useData from './useData';
 
+export type WithOptionalId<T> = Omit<T, 'id'> & { id?: string };
+
 export interface DataSourceInitOptions<T> {
   target: string;
   targetMode?: 'collection' | 'document' | 'number' | 'string' | 'boolean'; //TODO: implement
@@ -32,57 +34,58 @@ export interface DataSourceObject {
 //   dataSource: DataSourceSource<T>;
 // }
 
-export interface DataSourceActions<T> {
+export interface DataSourceActions<T, Z = T[]> {
   fetchData: (filter?: FilterObject<T>) => Promise<void>;
-  getAll: (filter?: FilterObject<T>) => Promise<T[] | null>;
+  getAll: (filter?: FilterObject<T>) => Promise<Z | null>;
   get: (id?: string) => Promise<T | null>;
-  add: (item: T) => Promise<T>;
-  update: (data: Partial<T>, id?: string) => Promise<T>;
-  set: (data: T, id?: string) => Promise<T>;
+  add: (item: WithOptionalId<T>) => Promise<T>;
+  update: (data: Partial<WithOptionalId<T>>, id?: string) => Promise<T>;
+  set: (data: WithOptionalId<T>, id?: string) => Promise<T>;
   delete: (id?: string) => Promise<void>;
   validate: (data: T) => Promise<boolean>;
   getDummyData: () => T;
 }
 
-export interface UseDataReturn<T> {
-  // Options supplied to class constructor
-  options?: DataSourceInitOptions<T>;
-  providerConfig?: any;
-  // Data state
-  data: T;
-  loading: boolean;
-  error: any;
-  // Provider name
-  provider: string;
-  // Actions
-  actions: DataSourceActions<T>;
-  // Predefined methods
-  // getAll: (filter?: object) => Promise<T[]>;
-  // get: (id?: string) => Promise<T | null>;
-  // add: (item: T) => Promise<T>;
-  // update: (data: Partial<T>, id?: string) => Promise<void>;
-  // set: (data: T, id?: string) => Promise<void>;
-  // delete: (id?: string) => Promise<void>;
-  // Raw datasource info
-  dataSource: any;
-  // Custom props
-  custom?: {
-    [key: string]: any;
-  };
-}
+// export interface UseDataReturn<T> {
+//   // Options supplied to class constructor
+//   options?: DataSourceInitOptions<T>;
+//   providerConfig?: any;
+//   // Data state
+//   data: T;
+//   loading: boolean;
+//   error: any;
+//   // Provider name
+//   provider: string;
+//   // Actions
+//   actions: DataSourceActions<T>;
+//   // Predefined methods
+//   // getAll: (filter?: object) => Promise<T[]>;
+//   // get: (id?: string) => Promise<T | null>;
+//   // add: (item: T) => Promise<T>;
+//   // update: (data: Partial<T>, id?: string) => Promise<void>;
+//   // set: (data: T, id?: string) => Promise<void>;
+//   // delete: (id?: string) => Promise<void>;
+//   // Raw datasource info
+//   dataSource: any;
+//   // Custom props
+//   custom?: {
+//     [key: string]: any;
+//   };
+// }
 
-export interface DataSource<T> {
+export interface DataSource<T, Z = T[]> {
+  //TODO: fix second generic type
   // Options supplied to class constructor
   options?: DataSourceInitOptions<T>;
   providerConfig?: any;
   // Data state
-  data: T;
+  data: Z;
   loading: boolean;
   error: any;
   // Provider name
   provider: string;
   // Actions
-  actions: DataSourceActions<T>;
+  actions: DataSourceActions<T, Z>;
   // Predefined methods
   // getAll: (filter?: object) => Promise<T[]>;
   // get: (id?: string) => Promise<T | null>;

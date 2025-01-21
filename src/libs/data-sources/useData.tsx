@@ -1,10 +1,12 @@
-import { useContext, useEffect, useMemo } from 'react';
-import { DataSource } from '.';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { DataSource, FilterObject, WithOptionalId } from '.';
 import { DataContext } from './DataProvider';
 
-interface UseDataPropsOptions {
+interface UseDataPropsOptions<T> {
   datasource?: any;
   addDatasourceWhenNotAvailable?: boolean;
+  filter?: FilterObject<T>;
+  find?: { field: keyof T; operator: '=='; value: any };
   [key: string]: any;
 }
 
@@ -13,11 +15,14 @@ interface UseDataPropsOptions {
 //   [key: string]: any;
 // }
 
-const defaultOptions: UseDataPropsOptions = {
+const defaultOptions = {
   addDatasourceWhenNotAvailable: true,
 };
 
-const useData = <T,>(key: string, options: UseDataPropsOptions = defaultOptions): DataSource<T> => {
+const useData = <T, Z = T[]>(
+  key: string,
+  options: UseDataPropsOptions<T> = defaultOptions
+): DataSource<T, Z> => {
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within a DataProvider');
@@ -110,7 +115,25 @@ const useData = <T,>(key: string, options: UseDataPropsOptions = defaultOptions)
     return getClassMethods(dataSource);
   }, [dataSource]);
 
-  const returnObject: DataSource<T> = useMemo(
+  const find = useCallback(
+    (id: string) => {
+      data[key].find((item: any) => item.id === id);
+    },
+    [data, key]
+  );
+
+  // const filteredData = useMemo(() => {
+  //   if (options?.find) {
+  //     return data[key].filter(
+  //       (item: T) =>
+  //         options.find?.field !== undefined && item[options.find.field] === options.find.value
+  //     );
+  //   } else {
+  //     return data[key];
+  //   }
+  // }, [data, key, options]); // TODO: implement
+
+  const returnObject: DataSource<T, Z> = useMemo(
     () => ({
       // Custom methods
       custom: { ...methods },
@@ -120,10 +143,11 @@ const useData = <T,>(key: string, options: UseDataPropsOptions = defaultOptions)
       error: error[key],
       // Public methods
       actions: {
-        fetchData: (filter?: any) => fetchData(key, filter),
+        fetchData: (filter?: FilterObject<T>) => fetchData(key, filter),
         get: get || (() => {}),
         getAll: getAll || (() => {}),
-        add: (item: T) => add(key, item),
+        find,
+        add: (item: WithOptionalId<T>) => add(key, item),
         update: (data, id) => update(key, data, id),
         set: (data, id) => set(key, data, id),
         delete: (id) => remove(key, id),
@@ -151,6 +175,7 @@ const useData = <T,>(key: string, options: UseDataPropsOptions = defaultOptions)
       error,
       get,
       getAll,
+      find,
       key,
       loading,
       methods,

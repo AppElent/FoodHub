@@ -1,21 +1,15 @@
 import useTabs, { TabOptions } from '@/hooks/use-tabs';
-import { Box, BoxProps, Tabs as DefaultTabs, Tab, TabProps, useTheme } from '@mui/material';
+import { Box, BoxProps, TabsProps as DTabsProps, TabProps, useTheme } from '@mui/material';
 import { CurrentTabContext, TabData } from '.';
 import TabPanel from './tab-panel';
+import TabsHeader from './tabs-header';
 
 interface TabsProps {
   tabOptions?: TabOptions;
   tabs: TabData[];
   muiBoxProps?: BoxProps;
-  muiTabsProps?: TabsProps;
+  muiTabsProps?: DTabsProps;
   muiTabProps?: TabProps;
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
-  };
 }
 
 const Tabs = ({ tabs, tabOptions, muiBoxProps, muiTabProps, muiTabsProps }: TabsProps) => {
@@ -23,33 +17,21 @@ const Tabs = ({ tabs, tabOptions, muiBoxProps, muiTabProps, muiTabsProps }: Tabs
   const { tab: currentTab, handleTabChange, setTab } = useTabs(tabs, tabOptions);
   //   const [value, setValue] = React.useState(0);
 
+  //TODO: version2.....
+
   return (
     <CurrentTabContext.Provider value={{ tabs, currentTab, handleTabChange, setTab }}>
       <Box
         sx={{ bgcolor: 'background.paper' }}
         {...muiBoxProps}
       >
-        <DefaultTabs
-          value={currentTab}
-          onChange={handleTabChange}
-          indicatorColor="secondary"
-          textColor="primary"
-          aria-label="full width tabs example"
-          //centered
-          variant="scrollable"
-          scrollButtons="auto"
-          {...muiTabsProps}
-        >
-          {tabs?.map((tab) => (
-            <Tab
-              key={tab.value}
-              label={tab.label}
-              value={tab.value}
-              {...a11yProps(0)}
-              {...muiTabProps}
-            />
-          ))}
-        </DefaultTabs>
+        <TabsHeader
+          currentTab={currentTab}
+          handleTabChange={handleTabChange}
+          tabs={tabs}
+          muiTabsProps={muiTabsProps}
+          muiTabProps={muiTabProps}
+        />
         {tabs?.map((tab, index) => {
           return (
             <TabPanel

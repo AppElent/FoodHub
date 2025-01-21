@@ -1,5 +1,6 @@
 import _, { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Filter } from '.';
 
 interface Options {
   initialPage?: number;
@@ -7,54 +8,57 @@ interface Options {
   limit?: number;
   initialSortField?: string | null;
   initialSortDirection?: 'asc' | 'desc';
-  initialFilters?: Record<string, any>;
+  initialFilters?: Filter[];
   searchableFields?: string[] | null;
   updateInitialData?: boolean;
   debounceTime?: number; // Add debounceTime option
 }
 
-interface UseFilterReturn {
-  data: any[];
+interface UseFilterReturn<T> {
+  data: T[];
   totalFilteredItems: number;
   page: number;
   pages: number;
   rowsPerPage: number;
   sortField: string | null;
   sortDirection: 'asc' | 'desc';
-  filters: Record<string, any>;
+  filters: Filter[];
   searchQuery: string;
   inputQuery: string;
-  addFilter: (key: string, filterFunctionOrValue: string | (() => void)) => void;
-  removeFilter: (key: string) => void;
+  // addFilter: (key: string, filterFunctionOrValue: string | (() => void)) => void;
+  // removeFilter: (key: string) => void;
+  setFilter: (id: string, filter: Filter) => void;
   setPage: (page: number) => void;
   setRowsPerPage: (rowsPerPage: number) => void;
   setSortField: (sortField: string | null) => void;
   setSortDirection: (sortDirection: 'asc' | 'desc') => void;
-  setFilters: (filters: Record<string, any>) => void;
+  setFilters: (filters: Filter[]) => void;
   setSearchQuery: (searchQuery: string) => void;
   setInputQuery: (inputQuery: string) => void;
-  setData: (data: any[]) => void;
+  setData: (data: T[]) => void;
 }
 
-const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterReturn => {
+//TODO: use type in usefilter call
+
+const useFilter = <T = any>(initialData: T[] = [], options: Options = {}): UseFilterReturn<T> => {
   const {
-    initialPage = 0,
+    initialPage = 1,
     initialRowsPerPage = 10,
     limit = Infinity,
     initialSortField = null,
     initialSortDirection = 'asc',
-    initialFilters = {},
+    initialFilters = [],
     searchableFields = null,
     updateInitialData = false,
     debounceTime = 300, // Default debounce time to 300ms
   } = options;
 
-  const [data, setData] = useState<any[]>(initialData);
+  const [data, setData] = useState<T[]>(initialData);
   const [page, setPage] = useState<number>(initialPage);
   const [rowsPerPage, setRowsPerPage] = useState<number>(initialRowsPerPage);
   const [sortField, setSortField] = useState<string | null>(initialSortField);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(initialSortDirection);
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState<Filter[]>(initialFilters);
   const [searchQuery, setSearchQuery] = useState('');
   const [inputQuery, setInputQuery] = useState(''); // State for the input value
 
@@ -77,35 +81,31 @@ const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterRet
     debouncedSetSearchQuery(query);
   };
 
-  /**
-   * Adds or updates a filter.
-   * @param {string} key - The key identifying the filter.
-   * @param {Function|any} filterFunctionOrValue - The filter function or value to be applied.
-   */
-  const addFilter = (key: string, filterFunctionOrValue: string | (() => void)) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [key]: filterFunctionOrValue,
-    }));
-  };
+  // const addFilter = (key: string, filterFunctionOrValue: string | (() => void)) => {
+  //   setFilters((prevFilters) => ({
+  //     ...prevFilters,
+  //     [key]: filterFunctionOrValue,
+  //   }));
+  // }; // TODO: replace
 
-  /**
-   * Removes a filter.
-   * @param {string} key - The key identifying the filter to be removed.
-   */
-  const removeFilter = (key: string) => {
+  // const removeFilter = (key: string) => {
+  //   setFilters((prevFilters) => {
+  //     const newFilters = { ...prevFilters };
+  //     delete newFilters[key];
+  //     return newFilters;
+  //   });
+  // }; //TODO: replace
+
+  const setFilter = useCallback((id: string, filter: Filter) => {
     setFilters((prevFilters) => {
-      const newFilters = { ...prevFilters };
-      delete newFilters[key];
-      return newFilters;
+      const index = prevFilters.findIndex((f) => f.id === id);
+      if (index === -1) {
+        return [...prevFilters, filter];
+      }
+      return [...prevFilters.slice(0, index), filter, ...prevFilters.slice(index + 1)];
     });
-  };
+  }, []);
 
-  /**
-   * Applies sorting to the given data array based on the specified sort field and direction.
-   * @param {any[]} data - The array of data to be sorted.
-   * @returns {any[]} The sorted array.
-   */
   const applySort = (data: any[]): any[] => {
     if (!sortField) return data;
 
@@ -122,28 +122,58 @@ const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterRet
     );
   };
 
-  /**
-   * Applies custom filters to the dataset.
-   * @param {Array} data - The dataset to be filtered.
-   * @returns {Array} The filtered dataset.
-   */
-  const applyFilters = (data: any[]) => {
-    return data.filter((item: any) => {
-      return Object.keys(filters).every((key) => {
-        const filter = filters[key];
-        if (typeof filter === 'function') {
-          return filter(item);
+  // const applyFilters = (data: T[]) => {
+  //   return data.filter((item: T) => {
+  //     return Object.keys(filters).every((key) => {
+  //       const filter = filters[key];
+  //       if (typeof filter === 'function') {
+  //         return filter(item);
+  //       }
+  //       return (item as Record<string, any>)[key] === filter;
+  //     });
+  //   });
+  // }; //TODO: replace
+
+  const applyFilters = (data: T[]): T[] => {
+    return data.filter((item) =>
+      filters.every((filter) => {
+        if (
+          filter.value === null ||
+          filter.value === undefined ||
+          (Array.isArray(filter.value) && filter.value.length === 0)
+        ) {
+          return true; // Skip unset filters
         }
-        return item[key] === filter;
-      });
-    });
+
+        switch (filter.type) {
+          case 'range': {
+            const rangeValue = filter.value;
+            return (
+              (rangeValue[0] === undefined ||
+                (item as Record<string, any>)[filter.id] >= rangeValue[0]) &&
+              (rangeValue[1] === undefined ||
+                (item as Record<string, any>)[filter.id] <= rangeValue[1])
+            );
+            // return (
+            //   (rangeValue.min === undefined ||
+            //     (item as Record<string, any>)[filter.id] >= rangeValue.min) &&
+            //   (rangeValue.max === undefined ||
+            //     (item as Record<string, any>)[filter.id] <= rangeValue.max)
+            // );
+          }
+          case 'multi-select':
+            return filter.value.includes((item as Record<string, any>)[filter.id]);
+          case 'boolean':
+            return (
+              filter.value === null || (item as Record<string, any>)[filter.id] === filter.value
+            );
+          default:
+            return true;
+        }
+      })
+    );
   };
 
-  /**
-   * Applies text search to the dataset based on searchable fields or all fields.
-   * @param {Array} data - The dataset to be searched.
-   * @returns {Array} The filtered dataset that matches the search query.
-   */
   const applyTextSearch = (data: any[]) => {
     if (!searchQuery) return data; // If no search query, return data unchanged
 
@@ -163,21 +193,12 @@ const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterRet
     });
   };
 
-  /**
-   * Applies pagination to the dataset based on the current page (0-based) and rowsPerPage.
-   * Then enforces the hard limit if necessary.
-   * @param {Array} data - The dataset to be paginated.
-   * @returns {Array} The paginated dataset.
-   */
   const applyPagination = (data: any[]) => {
-    const startIndex = page * rowsPerPage; // Start index for the current page (0-based)
+    const startIndex = (page - 1) * rowsPerPage; // Start index for the current page (1-based)
     const endIndex = Math.min(startIndex + rowsPerPage, limit); // Ensure no more than `limit` items are returned
     return data.slice(startIndex, endIndex);
   };
 
-  /**
-   * Total items after applying filters and search, but before pagination is applied.
-   */
   const totalFilteredItems = useMemo(() => {
     let processedData = applyFilters(data);
     processedData = applyTextSearch(processedData);
@@ -193,20 +214,12 @@ const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterRet
     return applyPagination(processedData);
   }, [data, filters, searchQuery, sortField, sortDirection, page, rowsPerPage, limit]);
 
-  /**
-   * Reset the page to 0 whenever filters, searchQuery, sortField, or sortDirection change,
-   * but only if the current page is not already 0 to avoid unnecessary resets.
-   */
   useEffect(() => {
-    if (page !== 0) {
-      setPage(0);
+    if (page !== 1) {
+      setPage(1);
     }
   }, [filters, searchQuery, sortField, sortDirection]);
 
-  /**
-   * Sets the number of rows per page and resets the page to 0.
-   * @param {number} newRowsPerPage - The new number of rows per page.
-   */
   const updateRowsPerPage = (newRowsPerPage: number) => {
     setRowsPerPage(newRowsPerPage);
     setPage(0); // Reset to page 0 when changing rows per page
@@ -230,8 +243,9 @@ const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterRet
     setRowsPerPage: updateRowsPerPage, // This allows setting rows per page
     setSortField,
     setSortDirection,
-    addFilter,
-    removeFilter,
+    // addFilter,
+    // removeFilter,
+    setFilter,
     setFilters,
     setSearchQuery: handleInputQueryChange, // Use the handler for input changes
     setInputQuery,

@@ -51,6 +51,22 @@ const useTabs = (tabsData: TabData[], options?: TabOptions) => {
     setTab(newValue);
   }, []);
 
+  // const newTabsData = useMemo(() => {
+  //   return tabsData.map((tab, index) => ({
+  //     ...tab,
+  //     component: tab.component && (
+  //       <TabPanel
+  //         key={tab.value}
+  //         value={tab.value}
+  //         index={index}
+  //         currentTab={currentTab}
+  //       >
+  //         {tab.component}
+  //       </TabPanel>
+  //     ),
+  //   }));
+  // }, [tabsData]); //TODO: fix
+
   // const getValue = () => {
   //   if (queryParamName) {
   //     // If there is a query param named tab then set that tab

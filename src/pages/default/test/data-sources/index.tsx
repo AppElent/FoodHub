@@ -5,7 +5,7 @@ import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorag
 import MockDataSource from '@/libs/data-sources/data-sources/MockDataSource';
 import useData from '@/libs/data-sources/useData';
 import Tabs, { useCurrentTab } from '@/libs/tabs';
-import { Dummy, dummyMockSchema, dummyYupSchema } from '@/schemas/dummy';
+import { Dummy, dummyConverter, dummyMockSchema, dummyYupSchema } from '@/schemas/dummy';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPage from '../../DefaultPage';
 
@@ -59,6 +59,24 @@ const datasources = {
         mockOptions: { schema: dummyMockSchema },
       },
       { db }
+    ),
+    'Collection - With Converter': new FirestoreDataSource(
+      {
+        target: 'dummy',
+        targetMode: 'collection',
+        subscribe: true,
+        YupValidationSchema: dummyYupSchema,
+      },
+      { db, converter: dummyConverter }
+    ),
+    'Document - With Converter': new FirestoreDataSource(
+      {
+        target: 'dummy/01iQznR3TyhzhI5ct5cQ',
+        targetMode: 'document',
+        subscribe: true,
+        YupValidationSchema: dummyYupSchema,
+      },
+      { db, converter: dummyConverter }
     ),
   },
   LocalStorage: {

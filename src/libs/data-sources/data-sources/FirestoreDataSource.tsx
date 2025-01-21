@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   DocumentSnapshot,
+  Firestore,
   getDoc,
   getDocs,
   limit,
@@ -12,6 +13,7 @@ import {
   QueryDocumentSnapshot,
   QuerySnapshot,
   setDoc,
+  SnapshotOptions,
   UpdateData,
   updateDoc,
   where,
@@ -20,13 +22,27 @@ import { DataSourceInitOptions, FilterObject, FilterReturn } from '..';
 import BaseDataSource from './BaseDataSource';
 
 interface FirestoreDataSourceProviderConfig {
-  db: any;
+  db: Firestore;
   clearUndefinedValues?: boolean;
+  converter?: {
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => any;
+    toFirestore: (data: any) => any;
+  };
 }
 
+// TODO: getDocFromCache implement
+
 export class FirestoreDataSource<T> extends BaseDataSource<T> {
-  firestore: any;
-  ref: any;
+  public firestore: Firestore;
+  public ref: any;
+  private defaultConverter: {
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => any;
+    toFirestore: (data: any) => any;
+  } = {
+    fromFirestore: (snapshot: QueryDocumentSnapshot) => ({ id: snapshot.id, ...snapshot.data() }),
+    toFirestore: (data: T) => data,
+  };
+  public converter = this.defaultConverter;
 
   constructor(
     options: DataSourceInitOptions<T>,
@@ -36,21 +52,19 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
 
     this.provider = 'Firestore';
     this.firestore = providerConfig.db;
+    if (providerConfig.converter) {
+      this.converter = providerConfig.converter;
+    }
     if (this.options.targetMode === 'collection') {
-      this.ref = collection(this.firestore, this.options.target);
+      this.ref = collection(this.firestore, this.options.target).withConverter(this.converter);
     } else if (this.options.targetMode === 'document') {
-      this.ref = doc(this.firestore, this.options.target);
+      this.ref = doc(this.firestore, this.options.target).withConverter(this.converter);
     }
   }
 
-  // #tryCatch = async (fn: () => any) => {
-  //   try {
-  //     return await fn();
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     throw error;
-  //   }
-  // };
+  // #getDoc = () => {
+  //   return this.ref;
+  // }
 
   // Get document reference
   #getRef = (id?: string) => {
@@ -171,7 +185,6 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       const filterObject = filter || this.options.targetFilter || {};
       //console.log(filterObject, filter, this.options.targetFilter);
       const { provider: query, postFilter } = this.#parseFilters(filterObject);
-      console.log(query, postFilter);
 
       const querySnapshot = await getDocs(query);
       let documents: any[] = [];
@@ -193,7 +206,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
         throw new Error('add() can only be used with collections');
       // Validate new data
       item = this.#clearUndefinedValues(item);
-      this.validate(item, { full: false });
+      this.validate(item);
       const docRef = await addDoc(this.ref, item);
       const newDoc = await getDoc(docRef);
       return { id: docRef.id, ...newDoc.data() } as T;
@@ -211,7 +224,11 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       }
       const docRef = this.#getRef(id);
       data = this.#clearUndefinedValues(data);
-      this.validate(data);
+      const validateResult = await this.validate(data, { strict: false });
+      if (!validateResult.valid) {
+        throw new Error('Validation failed');
+      }
+      console.log(docRef, data, id);
       await updateDoc(docRef, data as UpdateData<Partial<T>>);
     } catch (error) {
       console.error('Error updating document:', error);
@@ -227,7 +244,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
         throw new Error('set() requires an ID when using collections');
       }
       data = this.#clearUndefinedValues(data);
-      this.validate(data);
+      this.validate(data); // TODO: fix validation everywhere
       const docRef = this.#getRef(id);
       await setDoc(docRef, data);
     } catch (error) {
@@ -257,17 +274,19 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       this.options?.targetMode === 'document'
         ? onSnapshot(provider, (snapshot: DocumentSnapshot) => {
             const data = snapshot.data();
+            console.log(data);
             if (data) {
-              callback({ id: snapshot.id, ...snapshot.data() });
+              callback(data);
             } else {
               callback(null);
             }
           })
         : onSnapshot(provider, (snapshot: QuerySnapshot) => {
-            const documents: T[] = [];
-            snapshot.forEach((doc: QueryDocumentSnapshot) => {
-              documents.push({ id: doc.id, ...doc.data() } as T);
-            });
+            // const documents: T[] = [];
+            // snapshot.forEach((doc: QueryDocumentSnapshot) => {
+            //   documents.push({ ...doc.data() } as T);
+            // });
+            const documents: T[] = snapshot.docs.map((doc) => doc.data() as T);
             callback(this._applyPostFilters(documents, postFilter));
           });
 

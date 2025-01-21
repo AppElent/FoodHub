@@ -1,6 +1,22 @@
 import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
 import { DataSource, DataSourceObject } from '.';
 
+// interface DataProviderContextProps {
+//   dataSources: DataSourceObject;
+//   setDataSource: (key: string, dataSource: DataSource<any>) => void;
+//   addDataSource: (key: string, dataSource: DataSource<any>) => void;
+//   data: Record<string, any>;
+//   loading: Record<string, boolean>;
+//   error: Record<string, any>;
+//   fetchData: (key: string, filter?: object) => Promise<void>;
+//   subscribeToData: (key: string) => void;
+//   subscriptions: Record<string, () => void>;
+//   add: (key: string, item: any) => Promise<any>;
+//   update: (key: string, data: any, id: string) => Promise<void>;
+//   set: (key: string, data: any, id: string) => Promise<void>;
+//   remove: (key: string, id: string) => Promise<void>;
+// } // TODO: implement?
+
 // Create a context for the data
 export const DataContext = createContext<any>(undefined);
 

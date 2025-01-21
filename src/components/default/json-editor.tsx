@@ -1,5 +1,4 @@
 import ReactJson, { InteractionProps, ReactJsonViewProps } from '@microlink/react-json-view';
-import { JsonEditor as JsonEditorExternal } from 'json-edit-react';
 
 interface JsonEditorProps extends ReactJsonViewProps {
   validationSchema?: any;
@@ -41,14 +40,14 @@ const JsonEditor = (props: { data: any; options?: Partial<JsonEditorProps> }) =>
 
   return (
     <div>
-      <JsonEditorExternal
+      {/* <JsonEditorExternal
         data={data}
         setData={(alldata: any) => console.log(alldata)} // optional
         theme={['githubLight']}
         restrictDrag={false}
         restrictDelete={false}
         collapse={true}
-      />
+      /> */}
       <ReactJson
         src={data}
         {...jsonEditorOptions}

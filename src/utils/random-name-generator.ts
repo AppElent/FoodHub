@@ -2887,3 +2887,5 @@ export function generateName() {
     capFirst(name2[getRandomInt(0, name2.length + 1)]);
   return name;
 }
+
+export default generateName;

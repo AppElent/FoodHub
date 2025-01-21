@@ -3,8 +3,12 @@ import { Box, Button, Paper } from '@mui/material';
 import { useData } from '@/libs/data-sources';
 import DefaultPaperbasePage from './DefaultPaperbasePage';
 
+interface Settings {
+  test: string;
+}
+
 const Settings = () => {
-  const settings = useData('settings');
+  const settings = useData<Settings, Settings>('settings');
   console.log(settings);
 
   return (
