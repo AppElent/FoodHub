@@ -7,16 +7,18 @@ import SignIn from '@/pages/default/SignIn';
 import TestAuthProviders from '@/pages/default/test/auth-providers';
 import DataSources from '@/pages/default/test/data-sources/index';
 import FileUploads from '@/pages/default/test/file-uploads';
+import FiltersPage from '@/pages/default/test/filters-page';
 import Forms from '@/pages/default/test/forms';
+import SchemaPage from '@/pages/default/test/schema-page';
 import Translations from '@/pages/default/test/translations';
 import HomePage from '@/pages/recipes/home';
 import MyRecipeDetailsPage from '@/pages/recipes/my-recipe-details';
+import MyRecipeEdit from '@/pages/recipes/my-recipe-edit';
 import MyRecipeNew from '@/pages/recipes/my-recipe-new';
 import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
 import RecipeDetailsPage from '@/pages/recipes/recipe-details';
 import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import { CustomRouteObject, routes as routesImport } from './routing';
-import MyRecipeEdit from '@/pages/recipes/my-recipe-edit';
 
 const routeElements: { [key: string]: JSX.Element } = {
   home: (
@@ -55,6 +57,8 @@ const routeElements: { [key: string]: JSX.Element } = {
   testAuthProviders: <TestAuthProviders />,
   testForms: <Forms />,
   testTranslations: <Translations />,
+  testFilters: <FiltersPage />,
+  testSchemas: <SchemaPage />,
   // Default pages
   login: <SignIn mode="signin" />,
   signup: <SignIn mode="signup" />,

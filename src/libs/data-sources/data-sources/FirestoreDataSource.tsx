@@ -39,7 +39,7 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
     fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => any;
     toFirestore: (data: any) => any;
   } = {
-    fromFirestore: (snapshot: QueryDocumentSnapshot) => ({ id: snapshot.id, ...snapshot.data() }),
+    fromFirestore: (snapshot: QueryDocumentSnapshot) => ({ ...snapshot.data(), id: snapshot.id }),
     toFirestore: (data: T) => data,
   };
   //public converter = this.defaultConverter;
@@ -120,7 +120,7 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
         const data = docSnap.data();
         return { id: docSnap.id, ...(data ? data : {}) } as T;
       } else {
-        return this._getDefaultValue();
+        return this.defaultValue;
       }
     } catch (error) {
       console.error('Error getting document:', error);

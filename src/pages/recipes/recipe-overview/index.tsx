@@ -2,7 +2,7 @@ import RecipeOverview from '@/components/recipes/recipe-overview';
 import useAuth from '@/libs/auth/use-auth';
 import { useData } from '@/libs/data-sources';
 import DefaultPage from '@/pages/default/DefaultPage';
-import { Recipe } from '@/schemas/recipe/recipe';
+import { Recipe } from '@/schemas/recipes/recipe';
 
 const RecipeOverviewPage = () => {
   const { data } = useData<Recipe>('recipes');

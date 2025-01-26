@@ -52,6 +52,7 @@ export const routes: CustomRouteObject[] = [
             category: 'recipes',
             path: 'my',
             element: <Outlet />,
+            loginRequired: true,
             children: [
               {
                 id: 'myRecipesIndex',

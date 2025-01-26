@@ -5,7 +5,7 @@ import routes from '@/config/routes';
 import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
 
-import { Recipe, recipeYupSchema } from '@/schemas/recipe/recipe';
+import { Recipe, recipeYupSchema } from '@/schemas/recipes/recipe';
 import theme from '@/theme/paperbase/theme';
 import './App.css';
 import config from './config';

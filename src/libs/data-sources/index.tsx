@@ -16,6 +16,10 @@ export interface DataSourceInitOptions<T, Z = T[]> {
   idField?: keyof T;
   // schema?: Record<string, any>;
   defaultValue?: any;
+  timestamps?: {
+    createdAt?: string;
+    updatedAt?: string;
+  };
   // cleanValues?: {
   //   removeUndefined?: boolean;
   // };

@@ -1,5 +1,5 @@
 import RecipeCard from '@/components/recipes/recipe-card';
-import { Recipe } from '@/schemas/recipe/recipe';
+import { Recipe } from '@/schemas/recipes/recipe';
 import { Grid } from '@mui/material';
 
 //TODO: make a normal component not a page one

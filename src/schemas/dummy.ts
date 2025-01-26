@@ -36,6 +36,12 @@ export const dummyYupSchema = Yup.object().shape({
   oneOfDate: Yup.date().oneOf([new Date()]).optional(),
   minArray: Yup.array().of(Yup.string().required()).min(1).optional(),
   maxArray: Yup.array().of(Yup.string().required()).max(3).optional(),
+  createdAt: Yup.date()
+    .required()
+    .default(() => new Date()),
+  updatedAt: Yup.date()
+    .required()
+    .default(() => new Date()),
 });
 
 export type Dummy = Yup.InferType<typeof dummyYupSchema>;

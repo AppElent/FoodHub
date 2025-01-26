@@ -1,6 +1,6 @@
 import { useData } from '@/libs/data-sources';
 import DefaultPage from '@/pages/default/DefaultPage';
-import { Recipe } from '@/schemas/recipe/recipe';
+import { Recipe } from '@/schemas/recipes/recipe';
 import { Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

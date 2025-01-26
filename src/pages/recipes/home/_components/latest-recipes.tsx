@@ -1,6 +1,6 @@
 import RecipeCard from '@/components/recipes/recipe-card';
 import useRouter from '@/hooks/use-router';
-import { Recipe } from '@/schemas/recipe/recipe';
+import { Recipe } from '@/schemas/recipes/recipe';
 import { Container, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 

@@ -1,5 +1,5 @@
 import useRouter from '@/hooks/use-router';
-import { Recipe } from '@/schemas/recipe/recipe';
+import { Recipe } from '@/schemas/recipes/recipe';
 import { AccessTime as AccessTimeIcon, Restaurant as RestaurantIcon } from '@mui/icons-material';
 import {
   Button,

@@ -1,6 +1,6 @@
 // TODO: move fetch function here
 
-import { ExternalRecipe } from '@/schemas/recipe/external-recipe';
+import { ExternalRecipe } from '@/schemas/recipes/external-recipe';
 
 const fetchExternalRecipe = async (url: string): Promise<ExternalRecipe> => {
   const response = await fetch(url);

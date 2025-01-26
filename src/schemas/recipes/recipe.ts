@@ -44,16 +44,8 @@ export const recipeYupSchema = Yup.object().shape({
     .label('Nutrients'),
   image: Yup.string().optional().default('').label('Image'),
   images: Yup.array().of(Yup.string()).optional().default([]).label('Images'),
-  ingredients: Yup.array()
-    .of(Yup.string().min(2, 'Min 2 characters'))
-    .optional()
-    .default([''])
-    .label('Ingredients'),
-  instructions: Yup.array()
-    .of(Yup.string().min(3, 'Min 3 characters'))
-    .optional()
-    .default([''])
-    .label('Instructions'),
+  ingredients: Yup.array().of(Yup.string()).optional().default(['']).label('Ingredients'),
+  instructions: Yup.array().of(Yup.string()).optional().default(['']).label('Instructions'),
   comments: Yup.string().optional().default('').label('Comments'),
   score: Yup.number().optional().default(0).label('Score').nullable(),
   url: Yup.string().url().optional().default('').label('URL'),

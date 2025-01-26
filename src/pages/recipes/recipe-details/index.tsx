@@ -2,7 +2,7 @@ import RecipeDetails from '@/components/recipes/recipe-details';
 import useParamItem from '@/hooks/use-param-item';
 import { useData } from '@/libs/data-sources';
 import DefaultPage from '@/pages/default/DefaultPage';
-import { Recipe } from '@/schemas/recipe/recipe';
+import { Recipe } from '@/schemas/recipes/recipe';
 
 const RecipeDetailsPage = () => {
   const { data: recipes } = useData<Recipe>('recipes');
