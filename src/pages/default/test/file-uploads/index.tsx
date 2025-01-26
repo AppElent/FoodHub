@@ -1,13 +1,16 @@
-// @ts-nocheck
-
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import DefaultPage from '@/pages/default/DefaultPage';
 import ImageUploaderCard from '@/pages/default/test/file-uploads/_components/image-uploader-card';
 import SimpleCropper from '@/pages/default/test/file-uploads/_components/simple-cropper';
 import { Card, CardContent, CardHeader, Grid } from '@mui/material';
 
-const CardLayout = ({ title, children }) => {
+interface CardLayoutProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+const CardLayout = ({ title, children }: CardLayoutProps) => {
   return (
     <Card>
       <CardHeader title={title} />

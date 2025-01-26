@@ -45,17 +45,20 @@ const useDialog = (options?: UseDialogOptionsProps): UseDialogReturn => {
     }
   }, [isOpen, dialogDataParam]);
 
-  const setData = useCallback((data: any | null) => {
-    if (queryKeyRef.current) {
-      if (data) {
-        setDialogDataParam(data);
+  const setData = useCallback(
+    (data: any | null) => {
+      if (queryKeyRef.current && setDialogDataParam) {
+        if (data) {
+          setDialogDataParam(data);
+        } else {
+          setDialogDataParam(undefined);
+        }
       } else {
-        setDialogDataParam(undefined);
+        setDialogData(data);
       }
-    } else {
-      setDialogData(data);
-    }
-  }, []);
+    },
+    [setDialogDataParam]
+  );
 
   // Respond to changes in the query value
   useEffect(() => {

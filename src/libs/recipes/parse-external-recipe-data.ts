@@ -1,5 +1,5 @@
-import { ExternalRecipe } from '@/schemas/external-recipe';
-import { Recipe } from '@/schemas/recipe';
+import { ExternalRecipe } from '@/schemas/recipe/external-recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 
 const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {
   const timeObject =

@@ -1,5 +1,6 @@
 import CustomBreadcrumbs from '@/components/default/custom-breadcrumbs';
 import { Container } from '@mui/material';
+import { ComponentProps } from 'react';
 
 interface DefaultPageProps {
   // currentPage?: string;
@@ -7,7 +8,7 @@ interface DefaultPageProps {
   //   label: string;
   //   key: string;
   // }[];
-  options?: any;
+  options?: ComponentProps<typeof CustomBreadcrumbs>['options'];
   children?: React.ReactNode;
 }
 

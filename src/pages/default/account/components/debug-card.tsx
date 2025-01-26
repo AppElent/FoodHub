@@ -12,8 +12,8 @@ const DebugCard = ({
   );
 
   useEffect(() => {
-    setDebug(logLevel);
-  }, [logLevel]);
+    setDebug?.(logLevel);
+  }, [logLevel, setDebug]);
 
   return (
     <Card>

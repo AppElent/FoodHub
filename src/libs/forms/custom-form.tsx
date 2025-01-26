@@ -8,6 +8,7 @@ import { FieldOptions } from '.';
 // Create a context for global options
 const FormOptionsContext = createContext({});
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useFormOptions = (): FieldOptions => useContext(FormOptionsContext);
 
 interface CustomFormProps {

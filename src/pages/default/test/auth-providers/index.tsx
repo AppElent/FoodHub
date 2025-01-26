@@ -1,5 +1,6 @@
 import config from '@/config';
-import { FirebaseAuthProvider, useLoginForm } from '@/libs/auth';
+import FirebaseAuthProvider from '@/libs/auth/auth-providers/FirebaseAuthProvider';
+import useLoginForm from '@/libs/auth/use-login-form';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid, TextField } from '@mui/material';
 import DefaultPage from '../../DefaultPage';
 

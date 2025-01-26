@@ -1,4 +1,4 @@
-import { Recipe } from '@/schemas/recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 
 export const getKeywordSuggestions = (recipes: Recipe[]) => {
   // Get all unique values from recipe keywords

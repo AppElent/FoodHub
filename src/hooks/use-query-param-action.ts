@@ -25,13 +25,13 @@ const useQueryParamAction = (
         navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
       }
     }
-  }, [location.search, queryParamName, callback, navigate, options.removeAfterAction]);
+  }, [location, queryParamName, callback, navigate, options.removeAfterAction]);
 
   const clearQueryParam = useCallback(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.delete(queryParamName);
     navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
-  }, [location.search, queryParamName, navigate]);
+  }, [location, queryParamName, navigate]);
 
   return {
     clearQueryParam, // Provide a function to manually clear the query parameter

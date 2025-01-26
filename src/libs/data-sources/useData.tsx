@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { DataSource, FilterObject, WithOptionalId } from '.';
 import { DataContext } from './DataProvider';
 
@@ -19,10 +19,16 @@ const defaultOptions = {
   addDatasourceWhenNotAvailable: true,
 };
 
-const useData = <T, Z = T[]>(
+// Overload signatures
+
+// function useData<T>(key: string, options?: UseDataPropsOptions<T>): DataSource<T, T[]>;
+// function useData<T>(key: string, options?: UseDataPropsOptions<T>): DataSource<T, T>;
+
+// Implementation
+function useData<T, Z = T[]>(
   key: string,
   options: UseDataPropsOptions<T> = defaultOptions
-): DataSource<T, Z> => {
+): DataSource<T, Z> {
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within a DataProvider');
@@ -65,6 +71,7 @@ const useData = <T, Z = T[]>(
   }, [newDataSource, key, addDataSource, context.dataSources, addDatasourceWhenNotAvailable]);
 
   const { get, getAll } = dataSource || {};
+  const returnData = useMemo(() => data[key], [data, key]);
 
   function getClassMethods(obj: { [key: string]: any }): Record<string, () => any> {
     const allMethods: Record<string, () => any> = {};
@@ -115,30 +122,12 @@ const useData = <T, Z = T[]>(
     return getClassMethods(dataSource);
   }, [dataSource]);
 
-  const find = useCallback(
-    (id: string) => {
-      data[key].find((item: any) => item.id === id);
-    },
-    [data, key]
-  );
-
-  // const filteredData = useMemo(() => {
-  //   if (options?.find) {
-  //     return data[key].filter(
-  //       (item: T) =>
-  //         options.find?.field !== undefined && item[options.find.field] === options.find.value
-  //     );
-  //   } else {
-  //     return data[key];
-  //   }
-  // }, [data, key, options]); // TODO: implement
-
   const returnObject: DataSource<T, Z> = useMemo(
     () => ({
       // Custom methods
       custom: { ...methods },
       // Data state
-      data: data[key],
+      data: returnData,
       loading: loading[key] || false,
       error: error[key],
       // Public methods
@@ -146,23 +135,12 @@ const useData = <T, Z = T[]>(
         fetchData: (filter?: FilterObject<T>) => fetchData(key, filter),
         get: get || (() => {}),
         getAll: getAll || (() => {}),
-        find,
         add: (item: WithOptionalId<T>) => add(key, item),
         update: (data, id) => update(key, data, id),
         set: (data, id) => set(key, data, id),
         delete: (id) => remove(key, id),
         validate: dataSource?.validate,
-        getDummyData: dataSource?.getDummyData,
       },
-      // fetchData: (filter?: any) => fetchData(key, filter),
-      // get: get || (() => {}),
-      // getAll: getAll || (() => {}),
-      // add: (item: T) => add(key, item),
-      // update: (data, id) => update(key, data, id),
-      // set: (data, id) => set(key, data, id),
-      // delete: (id) => remove(key, id),
-      // validate: dataSource?.validate,
-      // getDummyData: dataSource?.getDummyData,
       // Raw datasource info
       dataSource,
       provider: dataSource?.provider,
@@ -170,22 +148,21 @@ const useData = <T, Z = T[]>(
     [
       add,
       fetchData,
-      data,
       dataSource,
       error,
       get,
       getAll,
-      find,
       key,
       loading,
       methods,
       remove,
       set,
       update,
+      returnData,
     ]
   );
 
   return returnObject;
-};
+}
 
 export default useData;

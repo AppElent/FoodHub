@@ -25,6 +25,11 @@ interface MenuCategory {
 
 const menuCategories: MenuCategory[] = [
   {
+    id: 'recipes',
+    label: 'Recipes',
+    translationKey: 'foodhub:menu.recipes',
+  },
+  {
     id: 'settings',
     label: 'Settings',
     translationKey: 'common:menu.settings',

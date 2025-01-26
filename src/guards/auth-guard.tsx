@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import config from '@/config';
 import useRouter from '@/hooks/use-router';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 
 interface AuthGuardProps {
   children: React.ReactNode;

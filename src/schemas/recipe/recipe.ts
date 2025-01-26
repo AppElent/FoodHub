@@ -1,7 +1,5 @@
-import { RECIPE_FIELDS } from '@/data/recipe-data';
 import * as Yup from 'yup';
-import { extractFieldDefinitionFromYupSchema, Schema } from '.';
-export const recipeSchema: Schema = {};
+import { createDefaultSchema } from '..';
 
 // TODO: Fix optional fields with default value... and then undefined values in firestore data
 export const recipeYupSchema = Yup.object().shape({
@@ -84,13 +82,20 @@ export const recipeYupSchema = Yup.object().shape({
 
 export type Recipe = Yup.InferType<typeof recipeYupSchema>;
 
-export type RecipeTemplate = Omit<Recipe, 'id'>;
+export const createRecipeSchema = () => {
+  const defaultSchema = createDefaultSchema<Recipe>(recipeYupSchema);
+  return {
+    ...defaultSchema,
+  };
+};
+
+//export type RecipeTemplate = Omit<Recipe, 'id'>;
 
 // console.log(extractSchemaLabels(recipeYupSchema));
 
-export const recipeDefaultValues: Partial<Recipe> = recipeYupSchema.getDefault();
+//export const recipeDefaultValues: Partial<Recipe> = recipeYupSchema.getDefault();
 
-export const recipeFields = extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS);
+//export const recipeFields = extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS);
 
 // console.log(recipeYupSchema.describe());
 // console.log(recipeYupSchema.fields);

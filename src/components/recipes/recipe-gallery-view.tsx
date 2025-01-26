@@ -1,16 +1,10 @@
 import RecipeCard from '@/components/recipes/recipe-card';
-import { Recipe } from '@/schemas/recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 import { Grid } from '@mui/material';
 
 //TODO: make a normal component not a page one
 
-const RecipeOverviewGalleryView = ({
-  recipes,
-  handleRecipeClick,
-}: {
-  recipes: Recipe[];
-  handleRecipeClick: (recipe: Recipe) => void;
-}) => {
+const RecipeOverviewGalleryView = ({ recipes }: { recipes: Recipe[] }) => {
   return (
     <Grid
       container
@@ -23,8 +17,8 @@ const RecipeOverviewGalleryView = ({
           sm={6}
           md={4}
           key={recipe.id}
-          onClick={() => handleRecipeClick(recipe)}
-          sx={{ display: 'flex', flexDirection: 'column' }}
+          //onClick={() => handleRecipeClick(recipe)}
+          // sx={{ display: 'flex', flexDirection: 'column' }}
         >
           <RecipeCard recipe={recipe} />
         </Grid>

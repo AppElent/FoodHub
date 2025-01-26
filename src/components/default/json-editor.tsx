@@ -34,7 +34,7 @@ const JsonEditor = (props: { data: any; options?: Partial<JsonEditorProps> }) =>
   const { validationSchema, ...jsonEditorOptions } = { ...defaultProps, ...options };
 
   const handleAdd = (data: InteractionProps) => {
-    //validationSchema.validate(data)
+    validationSchema?.validate(data);
     console.log('handleAdd', data);
   };
 

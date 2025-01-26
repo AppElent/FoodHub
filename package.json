@@ -1,7 +1,7 @@
 {
-  "name": "template-vite-ts-react-app",
+  "name": "foodhub",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,6 +19,7 @@
     "deploy:prd": "npm run lint-fix && npm run build && firebase deploy --only hosting:prd",
     "deploy:prd:skipchecks": "npm run build && firebase deploy --only hosting:prd",
     "deploy:prd:skipbuild": "firebase deploy --only hosting:prd",
+    "deploy": "npm run deploy:stg && npm run deploy:prd:skipbuild",
     "check-updates": "npx npm-check-updates -i",
     "docs": "jsdoc -c jsdoc.conf.json",
     "npm-check": "npm-check"

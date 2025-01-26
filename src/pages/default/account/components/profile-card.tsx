@@ -1,5 +1,14 @@
 import { CameraAlt as CameraAltIcon } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader, Grid, TextField } from '@mui/material';
+import {
+  Avatar,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Grid,
+  TextField,
+} from '@mui/material';
 import { useFormik } from 'formik';
 
 interface ProfileCardProps {
@@ -79,6 +88,8 @@ const ProfileCard = ({ profile, setProfile }: ProfileCardProps) => {
           {...formik.getFieldProps('email')}
           margin="normal"
         />
+      </CardContent>
+      <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button
           variant="contained"
           color="primary"
@@ -88,7 +99,7 @@ const ProfileCard = ({ profile, setProfile }: ProfileCardProps) => {
         >
           Save Changes
         </Button>
-      </CardContent>
+      </CardActions>
     </Card>
   );
 };

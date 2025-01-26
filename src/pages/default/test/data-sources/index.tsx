@@ -1,11 +1,11 @@
 import JsonEditor from '@/components/default/json-editor';
 import { db } from '@/config/firebase';
+import BaseDataSource from '@/libs/data-sources/data-sources/BaseDataSource';
 import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
-import MockDataSource from '@/libs/data-sources/data-sources/MockDataSource';
 import useData from '@/libs/data-sources/useData';
-import Tabs, { useCurrentTab } from '@/libs/tabs';
-import { Dummy, dummyConverter, dummyMockSchema, dummyYupSchema } from '@/schemas/dummy';
+import Tabs from '@/libs/tabs';
+import { createDummySchema, Dummy, dummyYupSchema } from '@/schemas/dummy';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPage from '../../DefaultPage';
 
@@ -17,7 +17,7 @@ const datasources = {
         targetMode: 'collection',
         subscribe: true,
         YupValidationSchema: dummyYupSchema,
-        mockOptions: { schema: dummyMockSchema },
+        // mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -31,7 +31,7 @@ const datasources = {
         targetMode: 'document',
         subscribe: true,
         YupValidationSchema: dummyYupSchema,
-        mockOptions: { schema: dummyMockSchema },
+        // mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -40,7 +40,7 @@ const datasources = {
         target: 'dummy/01iQznR3TyhzhI5ct5cQ',
         targetMode: 'document',
         YupValidationSchema: dummyYupSchema,
-        mockOptions: { schema: dummyMockSchema },
+        // mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -56,28 +56,28 @@ const datasources = {
           filters: [{ field: 'boolean', operator: '==', value: false }],
           pagination: { page: 1, pageSize: 5 },
         },
-        mockOptions: { schema: dummyMockSchema },
+        // mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
-    'Collection - With Converter': new FirestoreDataSource(
-      {
-        target: 'dummy',
-        targetMode: 'collection',
-        subscribe: true,
-        YupValidationSchema: dummyYupSchema,
-      },
-      { db, converter: dummyConverter }
-    ),
-    'Document - With Converter': new FirestoreDataSource(
-      {
-        target: 'dummy/01iQznR3TyhzhI5ct5cQ',
-        targetMode: 'document',
-        subscribe: true,
-        YupValidationSchema: dummyYupSchema,
-      },
-      { db, converter: dummyConverter }
-    ),
+    // 'Collection - With Converter': new FirestoreDataSource(
+    //   {
+    //     target: 'dummy',
+    //     targetMode: 'collection',
+    //     subscribe: true,
+    //     YupValidationSchema: dummyYupSchema,
+    //   },
+    //   { db, converter: dummyConverter }
+    // ),
+    // 'Document - With Converter': new FirestoreDataSource(
+    //   {
+    //     target: 'dummy/01iQznR3TyhzhI5ct5cQ',
+    //     targetMode: 'document',
+    //     subscribe: true,
+    //     YupValidationSchema: dummyYupSchema,
+    //   },
+    //   { db, converter: dummyConverter }
+    // ),
   },
   LocalStorage: {
     Realtime: new LocalStorageDataSource({
@@ -85,26 +85,41 @@ const datasources = {
       subscribe: true,
       YupValidationSchema: dummyYupSchema,
     }),
+    test2: new LocalStorageDataSource({
+      target: 'dummy',
+      subscribe: true,
+      YupValidationSchema: dummyYupSchema,
+    }),
     Normal: new LocalStorageDataSource({ target: 'dummy', YupValidationSchema: dummyYupSchema }),
   },
-  MockDataSource: {
-    Normal: new MockDataSource(
-      {
-        target: 'dummy',
-        subscribe: true,
-        YupValidationSchema: dummyYupSchema,
-        mockOptions: { schema: dummyMockSchema },
-      },
-      { count: 10 }
-    ),
+  Base: {
+    Realtime: new BaseDataSource({
+      target: 'dummy',
+      subscribe: true,
+      YupValidationSchema: dummyYupSchema,
+      data: createDummySchema().getTestData(5),
+    }),
   },
+  // MockDataSource: {
+  //   Normal: new MockDataSource(
+  //     {
+  //       target: 'dummy',
+  //       subscribe: true,
+  //       YupValidationSchema: dummyYupSchema,
+  //       mockOptions: { schema: dummyMockSchema },
+  //     },
+  //     { count: 10 }
+  //   ),
+  // },
 };
 
 const DataSource = (props: any) => {
   const { datasourceName, dataSource: newDataSource } = props;
   const datasource = useData<Dummy>(datasourceName, { datasource: newDataSource });
+
   const handleAdd = async () => {
-    const newItem = datasource.actions.getDummyData(); //getDummyTestData(1) as Dummy;
+    const newItem = createDummySchema().generateTestData(); //getDummyTestData(1) as Dummy;
+    console.log('newitem', newItem);
     await datasource.actions.add(newItem);
   };
 
@@ -165,11 +180,11 @@ const DataSource = (props: any) => {
   );
 };
 
-const DataSourceTab = () => {
-  const { currentTab } = useCurrentTab();
-  const dataSources: {
-    [key: string]: FirestoreDataSource<any> | LocalStorageDataSource | MockDataSource<any>;
-  } = datasources[currentTab as keyof typeof datasources];
+const DataSourceTab = ({ tab: currentTab }: { tab: string }) => {
+  //const { currentTab } = useCurrentTab();
+  const dataSources = datasources[currentTab as keyof typeof datasources] as {
+    [key: string]: FirestoreDataSource<any> | LocalStorageDataSource<any> | BaseDataSource<any>;
+  };
 
   return (
     <Grid
@@ -198,7 +213,7 @@ const DataSourceTab = () => {
 
 const DataOperations = () => {
   const tabsData = Object.keys(datasources).map((key) => {
-    const component = <DataSourceTab />;
+    const component = <DataSourceTab tab={key} />;
     return { label: key, value: key, component };
   });
   return (

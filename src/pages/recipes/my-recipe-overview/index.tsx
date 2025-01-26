@@ -1,15 +1,15 @@
 import RecipeOverview from '@/components/recipes/recipe-overview';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import { useData } from '@/libs/data-sources';
 import DefaultPage from '@/pages/default/DefaultPage';
-import { Recipe } from '@/schemas/recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 
 interface RecipeWithOwner extends Recipe {
   owner: string;
 }
 
 const MyRecipeOverviewPage = () => {
-  const { data } = useData<RecipeWithOwner[]>('recipes');
+  const { data } = useData<RecipeWithOwner>('recipes');
   const auth = useAuth({ redirectUnauthenticated: true });
   console.log(auth);
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { AutocompleteProps, TextFieldProps } from '@mui/material';
 
 export interface FieldConfig {
@@ -20,28 +21,6 @@ type MuiProps = {
 };
 
 interface TableProps {
-  // columns?: {
-  //   config: FieldConfig;
-  //   label: string;
-  //   key: string;
-  //   render?: (value: any) => any;
-  //   defaultValue?: any;
-  //   type?:
-  //     | 'text'
-  //     | 'number'
-  //     | 'date'
-  //     | 'datetime'
-  //     | 'time'
-  //     | 'currency'
-  //     | 'select'
-  //     | 'boolean'
-  //     | 'autocomplete';
-  //   options?: {
-  //     key: string;
-  //     value: any;
-  //   }[];
-  //   fieldDefinition?: FieldConfig;
-  // }[];
   columns: {
     [key: string]: FieldConfig;
   };

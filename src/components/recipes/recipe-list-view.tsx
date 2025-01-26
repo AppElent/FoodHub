@@ -1,5 +1,5 @@
 import NoImageAvailable from '@/components/default/images/no-image-available';
-import { Recipe } from '@/schemas/recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 import {
   Paper,
   Table,

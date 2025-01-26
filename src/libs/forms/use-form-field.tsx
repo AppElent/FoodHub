@@ -37,6 +37,7 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
     if (field.value && field.value !== inputValue) {
       setInputValue(field.value);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field?.value]);
 
   // Check for debounce setting. If set, debounce the change handler
@@ -46,6 +47,7 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
       debounce((value) => {
         helpers.setValue(value);
       }, debounceValue), // Adjust delay as needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [field.name, helpers]
   );
 

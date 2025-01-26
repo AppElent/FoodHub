@@ -46,7 +46,7 @@ interface CustomBreadcrumbsProps {
   options?: {
     [key: string]: {
       getLabel?: (params: { [key: string]: string }) => string;
-      options: {
+      options?: {
         label: string;
         key: string;
       }[];

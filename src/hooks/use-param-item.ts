@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import useDeepCompareMemo from './use-deep-compare-memo';
 
 interface UseParamItemProps<T> {
   id?: string;
@@ -15,6 +16,7 @@ const useParamItem = <T extends Record<string, any>>({
   defaultValue,
 }: UseParamItemProps<T>) => {
   const params = useParams();
+  const stableDefaultValue = useDeepCompareMemo(defaultValue);
   const item = useMemo(() => {
     const idParam = params[id];
     if (!idParam) {
@@ -22,10 +24,10 @@ const useParamItem = <T extends Record<string, any>>({
     }
     const foundItem = items.find((item: T) => item[field] === idParam);
     if (!foundItem) {
-      return defaultValue;
+      return stableDefaultValue;
     }
     return foundItem;
-  }, [items, params]);
+  }, [items, params, id, field, stableDefaultValue]);
   return item;
 };
 

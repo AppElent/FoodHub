@@ -23,7 +23,7 @@ import ListItemText from '@mui/material/ListItemText';
 import config from '@/config';
 import { getPath, menu } from '@/config/paths';
 import useRouter from '@/hooks/use-router';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import { Collapse } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

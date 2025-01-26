@@ -1,34 +1,8 @@
 import PropTypes from 'prop-types';
-import { createContext, useCallback, useEffect, useReducer } from 'react';
-import { AuthState, User } from '.';
+import { useCallback, useEffect, useReducer } from 'react';
+import { AuthContext, initialState } from './contextState';
 
 //const TemplateProvider = new IAuthProvider({ login: '/login', logout: '/logout' });
-
-export const initialState: AuthState = {
-  isAuthenticated: false,
-  isInitialized: false,
-  user: null,
-  raw: null,
-  options: { login: null },
-  provider: null,
-  signIn: async () => ({}) as User,
-  signUp: async () => ({}) as User,
-  signOut: async () => {},
-  //...TemplateProvider
-  // signUp: (_email: string, _password: string) => Promise<User>,
-  // signInWithEmailAndPassword: async () => Promise<void>,
-  // signInWithGoogle: async () => Promise<void>,
-  // signOut: async () => any,
-};
-
-export const AuthContext = createContext<AuthState>({
-  ...initialState,
-  // provider: 'FIREBASE',
-  // createUserWithEmailAndPassword: () => Promise.resolve(),
-  // signInWithEmailAndPassword: () => Promise.resolve(),
-  // signInWithGoogle: () => Promise.resolve(),
-  // signOut: () => Promise.resolve(),
-});
 
 export const AuthConsumer = AuthContext.Consumer;
 

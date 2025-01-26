@@ -1,11 +1,12 @@
 import SearchBar from '@/components/default/ui/search-bar';
 import RecipeOverviewGalleryView from '@/components/recipes/recipe-gallery-view';
 import useDialog from '@/hooks/use-dialog';
-import useFilter from '@/hooks/use-filter';
+
 import useIsMobile from '@/hooks/use-is-mobile';
 import useQueryParamAction from '@/hooks/use-query-param-action';
 import useRouter from '@/hooks/use-router';
-import { Recipe } from '@/schemas/recipe';
+import useFilter from '@/libs/filters/use-filter';
+import { Recipe } from '@/schemas/recipe/recipe';
 import RecipeEditDialog from '@/sections/recipes/recipe-edit-dialog';
 import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
 import { Fab, FormControl, Grid, MenuItem, Stack, TextField } from '@mui/material';
@@ -152,12 +153,7 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
       </Grid>
 
       {/* Gallery View */}
-      {view === 'gallery' && (
-        <RecipeOverviewGalleryView
-          recipes={filteredItems}
-          handleRecipeClick={handleRecipeClick}
-        />
-      )}
+      {view === 'gallery' && <RecipeOverviewGalleryView recipes={filteredItems} />}
 
       {/* List View */}
       {view === 'list' && (

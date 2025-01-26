@@ -1,7 +1,7 @@
 import LanguageSwitch from '@/components/default/layout/language-switch';
 import UserMenu from '@/components/default/layout/user-menu';
 import useRouter from '@/hooks/use-router';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import IssueDialog from '@/sections/default/issue-dialog';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';

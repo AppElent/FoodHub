@@ -2,7 +2,6 @@ import { Seo, setPageTitleSuffix } from '@/components/default/seo';
 import { SplashScreen } from '@/components/default/splash-screen';
 import config from '@/config';
 import useHttpsRedirect from '@/hooks/use-https-redirect';
-import { AuthConsumer, AuthProvider } from '@/libs/auth';
 import '@/libs/i18n';
 import defaultRoutes from '@/routes/defaultRoutes';
 import { Theme, ThemeProvider } from '@mui/material';
@@ -15,6 +14,7 @@ import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import ErrorBoundary from './components/default/error-boundary';
 import useRouter from './hooks/use-router';
+import { AuthConsumer, AuthProvider } from './libs/auth/context';
 import { DataProvider, DataSourceObject } from './libs/data-sources';
 
 interface DashboardProps {

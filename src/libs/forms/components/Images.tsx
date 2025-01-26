@@ -33,13 +33,7 @@ interface ImagesProps {
 const Images = ({
   name,
   field: fieldConfig,
-  // favorite: {
-  //   get: getFavorite,
-  //   set: setFavorite
-  // },
-  uploadImage,
   deleteImage,
-  postProcess,
   getFavorite,
   setFavorite,
   cropImage,

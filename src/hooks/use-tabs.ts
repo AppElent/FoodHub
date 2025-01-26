@@ -42,18 +42,24 @@ const useTabs = (tabsData: TabData[], options?: TabOptions) => {
   }, [queryParamName, searchParams, currentTab, tabsData]);
 
   // Update query param on tab change
-  const setTab = (newTab: string) => {
-    setCurrentTab(newTab);
-    if (queryParamName) {
-      const newSearchParams = new URLSearchParams(searchParams.toString());
-      newSearchParams.set(queryParamName, newTab);
-      setSearchParams(newSearchParams);
-    }
-  };
+  const setTab = useCallback(
+    (newTab: string) => {
+      setCurrentTab(newTab);
+      if (queryParamName && setSearchParams && searchParams) {
+        const newSearchParams = new URLSearchParams(searchParams.toString());
+        newSearchParams.set(queryParamName, newTab);
+        setSearchParams(newSearchParams);
+      }
+    },
+    [queryParamName, searchParams, setSearchParams]
+  );
 
-  const handleTabChange = useCallback((_e: any, newValue: any) => {
-    setTab(newValue);
-  }, []);
+  const handleTabChange = useCallback(
+    (_e: any, newValue: any) => {
+      setTab?.(newValue);
+    },
+    [setTab]
+  );
 
   // const getValue = () => {
   //   if (queryParamName) {

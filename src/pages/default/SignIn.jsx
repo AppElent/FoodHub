@@ -20,7 +20,8 @@ import config from '@/config';
 import useMounted from '@/hooks/use-mounted';
 import useRouter from '@/hooks/use-router';
 import useSearchParams from '@/hooks/use-search-params';
-import { useAuth, useLoginForm } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
+import useLoginForm from '@/libs/auth/use-login-form';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',

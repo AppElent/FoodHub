@@ -1,6 +1,6 @@
 import ImageCropper from '@/components/default/images/image-cropper';
 import useDialog from '@/hooks/use-dialog';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import ImageCropper from '@/components/default/images/image-cropper';
 import useDialog from '@/hooks/use-dialog';
 import { Button } from '@mui/material';
@@ -73,14 +71,14 @@ const ImageUploader = ({
   thumbnail,
   multiple = false,
 }: ImageUploaderProps) => {
-  const [imageSrc, setImageSrc] = useState<string>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const dialog = useDialog();
 
   const getFileName = (path: string): string => {
     return path.split('/').pop() || 'unknown-filename.jpg';
   };
 
-  const processFile = async (file) => {
+  const processFile = async (file: File) => {
     if (file) {
       if (file.size > max_size) {
         console.log(
@@ -105,7 +103,7 @@ const ImageUploader = ({
 
       if (thumbnail?.path) {
         const thumbnailBlob = await createThumbnail(file);
-        const thumbnailFile = new File([thumbnailBlob], getFileName(thumbnail.path), {
+        const thumbnailFile = new File([thumbnailBlob as Blob], getFileName(thumbnail.path), {
           type: 'image/jpeg',
         });
         const uploadFunction = thumbnail.uploadFile || uploadFile;
@@ -175,8 +173,8 @@ const ImageUploader = ({
         </Button>
       </label>
       <ImageCropper
-        imageUrl={imageSrc}
-        filename={cropObject?.path}
+        imageUrl={imageSrc as string}
+        filename={cropObject?.path as string}
         onSave={cropObject?.uploadFile || uploadFile}
         dialog={{ isOpen: !!imageSrc, close: () => setImageSrc(null) }}
         cropperProps={cropObject?.props}

@@ -9,7 +9,14 @@ import DataSources from '@/pages/default/test/data-sources/index';
 import FileUploads from '@/pages/default/test/file-uploads';
 import Forms from '@/pages/default/test/forms';
 import Translations from '@/pages/default/test/translations';
+import HomePage from '@/pages/recipes/home';
+import MyRecipeDetailsPage from '@/pages/recipes/my-recipe-details';
+import MyRecipeNew from '@/pages/recipes/my-recipe-new';
+import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
+import RecipeDetailsPage from '@/pages/recipes/recipe-details';
+import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import { CustomRouteObject, routes as routesImport } from './routing';
+import MyRecipeEdit from '@/pages/recipes/my-recipe-edit';
 
 const routeElements: { [key: string]: JSX.Element } = {
   home: (
@@ -19,14 +26,15 @@ const routeElements: { [key: string]: JSX.Element } = {
       </Suspense>
     </PaperbaseLayout>
   ),
-  homeIndex: <>Home</>,
   // Recipe pages
-  // homeIndex: <HomePage />,
-  // recipesIndex: <RecipeOverviewPage />,
-  // myRecipes: <MyRecipeOverviewPage />,
-  // myRecipesIndex: <MyRecipeOverviewPage />,
-  // recipeDetails: <RecipeDetailsPage />,
-  // myRecipeDetails: <RecipeDetailsPage />,
+  homeIndex: <HomePage />,
+  recipesIndex: <RecipeOverviewPage />,
+  myRecipes: <MyRecipeOverviewPage />,
+  myRecipesIndex: <MyRecipeOverviewPage />,
+  recipeDetails: <RecipeDetailsPage />,
+  myRecipeDetailsIndex: <MyRecipeDetailsPage />,
+  myRecipeNew: <MyRecipeNew />,
+  myRecipeEdit: <MyRecipeEdit />,
   // Satisfactory pages
   // satisfactoryIndex: <>TEST</>,
   // products: <Products />,

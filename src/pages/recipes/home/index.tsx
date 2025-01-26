@@ -1,6 +1,6 @@
 import { useData } from '@/libs/data-sources';
 import DefaultPage from '@/pages/default/DefaultPage';
-import { Recipe } from '@/schemas/recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 import { Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import RecipeCarroussel from './_components/recipe-carroussel';
 // TODO: Fix and implement the horizontal scroll card list component
 
 const HomePage = () => {
-  const { data: recipes } = useData<Recipe[]>('recipes');
+  const { data: recipes } = useData<Recipe>('recipes');
   const { t } = useTranslation('foodhub');
 
   // Sort recipes by createdAt desc and pick the first 6 that have a non-nullish image

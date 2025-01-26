@@ -28,21 +28,7 @@ interface ImageProps {
   cropImage?: (url: string) => Promise<string>;
 }
 
-const Image = ({
-  name,
-  field: fieldConfig,
-  // favorite: {
-  //   get: getFavorite,
-  //   set: setFavorite
-  // },
-  uploadImage,
-  deleteImage,
-  postProcess,
-  getFavorite,
-  setFavorite,
-  cropImage,
-  ...props
-}: ImageProps) => {
+const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: ImageProps) => {
   if (!name && !fieldConfig) {
     throw new Error('Either name or field must be provided');
   }

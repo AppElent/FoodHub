@@ -1,7 +1,7 @@
 import useDialog from '@/hooks/use-dialog';
 import useIsMobile from '@/hooks/use-is-mobile';
-import { useAuth } from '@/libs/auth';
-import { Recipe } from '@/schemas/recipe';
+import useAuth from '@/libs/auth/use-auth';
+import { Recipe } from '@/schemas/recipe/recipe';
 import {
   AccessTime as AccessTimeIcon,
   Edit as EditIcon,

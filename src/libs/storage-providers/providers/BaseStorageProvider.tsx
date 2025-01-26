@@ -1,4 +1,3 @@
- 
 export interface StorageClassOptions {
   [key: string]: any;
 }
@@ -11,6 +10,7 @@ export default class BaseStorageProvider {
     this.options = options;
     this.providerOptions = providerOptions;
     this.uploadFile = this.uploadFile.bind(this);
+    this.listFiles = this.listFiles.bind(this);
     this.getFile = this.getFile.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
   }
@@ -53,6 +53,10 @@ export default class BaseStorageProvider {
   }
 
   async deleteFile(_fileId: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  async resizeImage(_file: File, _maxWidth: number, _maxHeight: number): Promise<File> {
     throw new Error('Method not implemented.');
   }
 }

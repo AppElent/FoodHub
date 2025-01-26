@@ -46,6 +46,7 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
     };
 
     return values;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields, formikProps.initialValues, validationSchema]);
 
   const formik = useFormik({

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import {
   AccountCircle,
   RssFeed as BlogIcon,

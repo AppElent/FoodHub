@@ -68,6 +68,7 @@ const useFilter = <T = any>(initialData: T[] = [], options: Options = {}): UseFi
   }, [initialData, updateInitialData]);
 
   // Debounced search query handler
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetSearchQuery = useCallback(
     debounce((query: string) => {
       setSearchQuery(query);
@@ -106,21 +107,24 @@ const useFilter = <T = any>(initialData: T[] = [], options: Options = {}): UseFi
     });
   }, []);
 
-  const applySort = (data: any[]): any[] => {
-    if (!sortField) return data;
+  const applySort = useCallback(
+    (data: any[]): any[] => {
+      if (!sortField) return data;
 
-    return _.orderBy(
-      data,
-      (item) => {
-        const value = item[sortField as string];
-        if (typeof value === 'string') {
-          return value.toLowerCase();
-        }
-        return value === undefined || value === null ? '' : value;
-      },
-      [sortDirection]
-    );
-  };
+      return _.orderBy(
+        data,
+        (item) => {
+          const value = item[sortField as string];
+          if (typeof value === 'string') {
+            return value.toLowerCase();
+          }
+          return value === undefined || value === null ? '' : value;
+        },
+        [sortDirection]
+      );
+    },
+    [sortDirection, sortField]
+  );
 
   // const applyFilters = (data: T[]) => {
   //   return data.filter((item: T) => {
@@ -134,77 +138,86 @@ const useFilter = <T = any>(initialData: T[] = [], options: Options = {}): UseFi
   //   });
   // }; //TODO: replace
 
-  const applyFilters = (data: T[]): T[] => {
-    return data.filter((item) =>
-      filters.every((filter) => {
-        if (
-          filter.value === null ||
-          filter.value === undefined ||
-          (Array.isArray(filter.value) && filter.value.length === 0)
-        ) {
-          return true; // Skip unset filters
-        }
-
-        switch (filter.type) {
-          case 'range': {
-            const rangeValue = filter.value;
-            return (
-              (rangeValue[0] === undefined ||
-                (item as Record<string, any>)[filter.id] >= rangeValue[0]) &&
-              (rangeValue[1] === undefined ||
-                (item as Record<string, any>)[filter.id] <= rangeValue[1])
-            );
-            // return (
-            //   (rangeValue.min === undefined ||
-            //     (item as Record<string, any>)[filter.id] >= rangeValue.min) &&
-            //   (rangeValue.max === undefined ||
-            //     (item as Record<string, any>)[filter.id] <= rangeValue.max)
-            // );
+  const applyFilters = useCallback(
+    (data: T[]): T[] => {
+      return data.filter((item) =>
+        filters.every((filter) => {
+          if (
+            filter.value === null ||
+            filter.value === undefined ||
+            (Array.isArray(filter.value) && filter.value.length === 0)
+          ) {
+            return true; // Skip unset filters
           }
-          case 'multi-select':
-            return filter.value.includes((item as Record<string, any>)[filter.id]);
-          case 'boolean':
-            return (
-              filter.value === null || (item as Record<string, any>)[filter.id] === filter.value
-            );
-          default:
-            return true;
-        }
-      })
-    );
-  };
 
-  const applyTextSearch = (data: any[]) => {
-    if (!searchQuery) return data; // If no search query, return data unchanged
+          switch (filter.type) {
+            case 'range': {
+              const rangeValue = filter.value;
+              return (
+                (rangeValue[0] === undefined ||
+                  (item as Record<string, any>)[filter.id] >= rangeValue[0]) &&
+                (rangeValue[1] === undefined ||
+                  (item as Record<string, any>)[filter.id] <= rangeValue[1])
+              );
+              // return (
+              //   (rangeValue.min === undefined ||
+              //     (item as Record<string, any>)[filter.id] >= rangeValue.min) &&
+              //   (rangeValue.max === undefined ||
+              //     (item as Record<string, any>)[filter.id] <= rangeValue.max)
+              // );
+            }
+            case 'multi-select':
+              return filter.value.includes((item as Record<string, any>)[filter.id]);
+            case 'boolean':
+              return (
+                filter.value === null || (item as Record<string, any>)[filter.id] === filter.value
+              );
+            default:
+              return true;
+          }
+        })
+      );
+    },
+    [filters]
+  );
 
-    const lowerCaseQuery = searchQuery.toLowerCase();
+  const applyTextSearch = useCallback(
+    (data: any[]) => {
+      if (!searchQuery) return data; // If no search query, return data unchanged
 
-    return data.filter((item) => {
-      // Use all fields if `searchableFields` is null
-      const fieldsToSearch = searchableFields || Object.keys(item);
+      const lowerCaseQuery = searchQuery.toLowerCase();
 
-      return fieldsToSearch.some((field) => {
-        const fieldValue = item[field];
-        if (fieldValue) {
-          return fieldValue.toString().toLowerCase().includes(lowerCaseQuery);
-        }
-        return false;
+      return data.filter((item) => {
+        // Use all fields if `searchableFields` is null
+        const fieldsToSearch = searchableFields || Object.keys(item);
+
+        return fieldsToSearch.some((field) => {
+          const fieldValue = item[field];
+          if (fieldValue) {
+            return fieldValue.toString().toLowerCase().includes(lowerCaseQuery);
+          }
+          return false;
+        });
       });
-    });
-  };
+    },
+    [searchQuery, searchableFields]
+  );
 
-  const applyPagination = (data: any[]) => {
-    const startIndex = (page - 1) * rowsPerPage; // Start index for the current page (1-based)
-    const endIndex = Math.min(startIndex + rowsPerPage, limit); // Ensure no more than `limit` items are returned
-    return data.slice(startIndex, endIndex);
-  };
+  const applyPagination = useCallback(
+    (data: any[]) => {
+      const startIndex = (page - 1) * rowsPerPage; // Start index for the current page (1-based)
+      const endIndex = Math.min(startIndex + rowsPerPage, limit); // Ensure no more than `limit` items are returned
+      return data.slice(startIndex, endIndex);
+    },
+    [limit, page, rowsPerPage]
+  );
 
   const totalFilteredItems = useMemo(() => {
     let processedData = applyFilters(data);
     processedData = applyTextSearch(processedData);
     processedData = applySort(processedData);
     return Math.min(processedData.length, limit); // Respect hard limit for total count
-  }, [data, filters, searchQuery, sortField, sortDirection, limit]);
+  }, [applyFilters, data, applyTextSearch, applySort, limit]);
 
   // Memoized computation of filtered, sorted, searched, and paginated data
   const filteredData = useMemo(() => {
@@ -212,12 +225,13 @@ const useFilter = <T = any>(initialData: T[] = [], options: Options = {}): UseFi
     processedData = applyTextSearch(processedData);
     processedData = applySort(processedData);
     return applyPagination(processedData);
-  }, [data, filters, searchQuery, sortField, sortDirection, page, rowsPerPage, limit]);
+  }, [applyFilters, data, applyTextSearch, applySort, applyPagination]);
 
   useEffect(() => {
     if (page !== 1) {
       setPage(1);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, searchQuery, sortField, sortDirection]);
 
   const updateRowsPerPage = (newRowsPerPage: number) => {

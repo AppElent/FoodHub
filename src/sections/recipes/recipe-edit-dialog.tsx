@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import JsonEditor from '@/components/default/json-editor';
 import GridLayout from '@/components/default/ui/grid-layout';
 import { getLogLevel } from '@/config';
@@ -8,7 +6,7 @@ import useGuid from '@/hooks/use-guid';
 import useIsMobile from '@/hooks/use-is-mobile';
 import useQueryParamAction from '@/hooks/use-query-param-action';
 import useRouter from '@/hooks/use-router';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import { useData } from '@/libs/data-sources';
 import { CustomForm } from '@/libs/forms';
 import AutocompleteChipList from '@/libs/forms/components/AutocompleteChipList';
@@ -24,9 +22,8 @@ import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { getCuisineSuggestions, getKeywordSuggestions } from '@/libs/recipes/get-recipe-fields';
 import parseExternalRecipeData from '@/libs/recipes/parse-external-recipe-data';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
-import { ExternalRecipe } from '@/schemas/external-recipe';
-import { recipeFields, recipeYupSchema } from '@/schemas/recipe';
-import Recipe from '@/types/recipe';
+import { ExternalRecipe } from '@/schemas/recipe/external-recipe';
+import { createRecipeSchema, Recipe, recipeYupSchema } from '@/schemas/recipe/recipe';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import {
@@ -91,7 +88,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
     }
     for (const url of images) {
       // Check if image url is manually uploaded to firebasestorage
-      if (url.startsWith('https://firebasestorage.googleapis.com')) {
+      if (url?.startsWith('https://firebasestorage.googleapis.com')) {
         await storageClass.deleteFile(url);
       }
     }
@@ -107,7 +104,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
   }, [recipe, auth.user]);
 
   // Get fields and suggestions
-  const fields = recipeFields;
+  const fields = useMemo(() => createRecipeSchema().getFieldDefinitions(), []);
   const keywordSuggestions = useMemo(() => recipes && getKeywordSuggestions(recipes), [recipes]);
   const cuisineSuggestions = useMemo(() => recipes && getCuisineSuggestions(recipes), [recipes]);
 

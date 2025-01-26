@@ -2,17 +2,16 @@ import ScrollToTop from '@/components/default/scroll-to-top';
 import '@/config/firebase';
 import { db } from '@/config/firebase';
 import routes from '@/config/routes';
-import { FirebaseAuthProvider } from '@/libs/auth';
 import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
 
-import { recipeYupSchema } from '@/schemas/recipe';
+import { Recipe, recipeYupSchema } from '@/schemas/recipe/recipe';
 import theme from '@/theme/paperbase/theme';
 import './App.css';
 import config from './config';
 import { getPath } from './config/paths';
 import Dashboard from './Dashboard';
-import { Recipe } from './schemas/recipe';
+import FirebaseAuthProvider from './libs/auth/auth-providers/FirebaseAuthProvider';
 
 const firebaseProvider = new FirebaseAuthProvider({
   login: getPath('login').to,

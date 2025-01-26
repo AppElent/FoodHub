@@ -1,9 +1,22 @@
-import { Recipe } from '@/schemas/recipe';
+import useRouter from '@/hooks/use-router';
+import { Recipe } from '@/schemas/recipe/recipe';
 import { AccessTime as AccessTimeIcon, Restaurant as RestaurantIcon } from '@mui/icons-material';
-import { Card, CardContent, CardMedia, Chip, Rating, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Chip,
+  Rating,
+  Typography,
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import NoImageAvailable from '../default/images/no-image-available';
 
 const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
+  const { t } = useTranslation();
+  const router = useRouter();
   return (
     <Card sx={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
       {recipe.image ? (
@@ -71,6 +84,15 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
           />
         )}
       </CardContent>
+      <CardActions sx={{ justifyContent: 'flex-end' }}>
+        <Button
+          onClick={() => router.push(recipe.id)}
+          size="small"
+          variant="contained"
+        >
+          {t('common:actions.show')}
+        </Button>
+      </CardActions>
     </Card>
   );
 };

@@ -1,98 +1,66 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useContext } from 'react';
 import * as Yup from 'yup';
+import BaseDataSource, { ValidationResult } from './data-sources/BaseDataSource';
 import DataProvider, { DataContext } from './DataProvider';
 import useData from './useData';
 
 export type WithOptionalId<T> = Omit<T, 'id'> & { id?: string };
 
-export interface DataSourceInitOptions<T> {
+export interface DataSourceInitOptions<T, Z = T[]> {
   target: string;
   targetMode?: 'collection' | 'document' | 'number' | 'string' | 'boolean'; //TODO: implement
   targetFilter?: FilterObject<T>;
   subscribe?: boolean;
   YupValidationSchema?: Yup.AnySchema;
-  schema?: Record<string, any>;
+  idField?: keyof T;
+  // schema?: Record<string, any>;
   defaultValue?: any;
-  cleanValues?: {
-    removeUndefined?: boolean;
+  // cleanValues?: {
+  //   removeUndefined?: boolean;
+  // };
+  // mock?: boolean; //TODO: implement OR delete
+  // mockOptions?: {
+  //   count?: number;
+  //   schema?: {
+  //     [key: string]: () => any;
+  //   };
+  // };
+  converter?: {
+    toDatabase: (data: T) => any;
+    fromDatabase: (data: any) => T;
   };
-  mock?: boolean; //TODO: implement
-  mockOptions?: {
-    count?: number;
-    schema?: {
-      [key: string]: () => any;
-    };
-  };
+  data?: Z;
 }
 
 export interface DataSourceObject {
-  [key: string]: any;
+  [key: string]: BaseDataSource<any>;
 }
 
-// export interface DataSource<T> {
-//   key: string;
-//   dataSource: DataSourceSource<T>;
-// }
-
-export interface DataSourceActions<T, Z = T[]> {
+export interface DataSourceActions<T> {
   fetchData: (filter?: FilterObject<T>) => Promise<void>;
-  getAll: (filter?: FilterObject<T>) => Promise<Z | null>;
+  getAll: (filter?: FilterObject<T>) => Promise<T[] | []>;
   get: (id?: string) => Promise<T | null>;
   add: (item: WithOptionalId<T>) => Promise<T>;
-  update: (data: Partial<WithOptionalId<T>>, id?: string) => Promise<T>;
+  update: (data: Partial<WithOptionalId<T>>, id?: string) => Promise<T>; // TODO: method overloading
   set: (data: WithOptionalId<T>, id?: string) => Promise<T>;
   delete: (id?: string) => Promise<void>;
-  validate: (data: T) => Promise<boolean>;
-  getDummyData: () => T;
+  validate: (data: Partial<T>) => Promise<ValidationResult>;
 }
-
-// export interface UseDataReturn<T> {
-//   // Options supplied to class constructor
-//   options?: DataSourceInitOptions<T>;
-//   providerConfig?: any;
-//   // Data state
-//   data: T;
-//   loading: boolean;
-//   error: any;
-//   // Provider name
-//   provider: string;
-//   // Actions
-//   actions: DataSourceActions<T>;
-//   // Predefined methods
-//   // getAll: (filter?: object) => Promise<T[]>;
-//   // get: (id?: string) => Promise<T | null>;
-//   // add: (item: T) => Promise<T>;
-//   // update: (data: Partial<T>, id?: string) => Promise<void>;
-//   // set: (data: T, id?: string) => Promise<void>;
-//   // delete: (id?: string) => Promise<void>;
-//   // Raw datasource info
-//   dataSource: any;
-//   // Custom props
-//   custom?: {
-//     [key: string]: any;
-//   };
-// }
 
 export interface DataSource<T, Z = T[]> {
   //TODO: fix second generic type
   // Options supplied to class constructor
-  options?: DataSourceInitOptions<T>;
+  options?: DataSourceInitOptions<T, Z>;
   providerConfig?: any;
   // Data state
-  data: Z;
+  data: Z; //T | T[] | Partial<T> | null | string | number | boolean;
   loading: boolean;
   error: any;
   // Provider name
   provider: string;
   // Actions
-  actions: DataSourceActions<T, Z>;
-  // Predefined methods
-  // getAll: (filter?: object) => Promise<T[]>;
-  // get: (id?: string) => Promise<T | null>;
-  // add: (item: T) => Promise<T>;
-  // update: (data: Partial<T>, id?: string) => Promise<void>;
-  // set: (data: T, id?: string) => Promise<void>;
-  // delete: (id?: string) => Promise<void>;
+  actions: DataSourceActions<T>;
   // Raw datasource info
   dataSource: any;
   // Custom props

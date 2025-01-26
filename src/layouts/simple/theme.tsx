@@ -1,6 +1,16 @@
-// @ts-nocheck
-
 import { createTheme } from '@mui/material';
+
+// Extend the BreakpointOverrides to include 'menu'
+declare module '@mui/material/styles' {
+  interface BreakpointOverrides {
+    xs: true;
+    sm: true;
+    md: true;
+    lg: true;
+    xl: true;
+    menu: true; // add custom breakpoint
+  }
+}
 
 const theme = createTheme({
   breakpoints: {

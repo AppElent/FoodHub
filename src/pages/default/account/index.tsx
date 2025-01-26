@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import { AppConfig, setLogLevel } from '@/config';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { Button, Card, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPage from '../DefaultPage';
@@ -39,7 +37,7 @@ const Account = () => {
         >
           <ProfileCard
             profile={auth?.user}
-            setProfile={async (values) => await auth.updateProfile(values)}
+            setProfile={async (values) => await auth.updateProfile?.(values)}
           />
         </Grid>
         <Grid
@@ -50,7 +48,7 @@ const Account = () => {
           <PasswordCard
             setPassword={async (oldPassword, newPassword) => {
               console.log(oldPassword, newPassword);
-              await auth.updatePassword(oldPassword, newPassword);
+              await auth.updatePassword?.(oldPassword, newPassword);
             }}
           />
         </Grid>

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { DataSourceInitOptions } from '..';
 import BaseDataSource from './BaseDataSource';
 
@@ -25,7 +27,7 @@ export class MockDataSource<T> extends BaseDataSource<T> {
     super(options, providerConfig);
     this.data = [...(providerConfig.data || [])];
     if (providerConfig?.count && providerConfig.count > 0) {
-      this.data.push(...(this.getDummyData(providerConfig.count) as T[]));
+      //this.data.push(...(this.getDummyData(providerConfig.count) as T[]));
     }
   }
 
@@ -111,7 +113,6 @@ export class MockDataSource<T> extends BaseDataSource<T> {
    * @private
    */
   private notifySubscribers = (data: any): void => {
-    console.log(this.callbacks);
     this.callbacks.forEach((callback) => callback(data));
   };
 }

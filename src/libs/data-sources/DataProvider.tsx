@@ -1,24 +1,26 @@
 import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
-import { DataSource, DataSourceObject } from '.';
+import { DataSourceObject, FilterObject } from '.';
+import BaseDataSource from './data-sources/BaseDataSource';
 
-// interface DataProviderContextProps {
-//   dataSources: DataSourceObject;
-//   setDataSource: (key: string, dataSource: DataSource<any>) => void;
-//   addDataSource: (key: string, dataSource: DataSource<any>) => void;
-//   data: Record<string, any>;
-//   loading: Record<string, boolean>;
-//   error: Record<string, any>;
-//   fetchData: (key: string, filter?: object) => Promise<void>;
-//   subscribeToData: (key: string) => void;
-//   subscriptions: Record<string, () => void>;
-//   add: (key: string, item: any) => Promise<any>;
-//   update: (key: string, data: any, id: string) => Promise<void>;
-//   set: (key: string, data: any, id: string) => Promise<void>;
-//   remove: (key: string, id: string) => Promise<void>;
-// } // TODO: implement?
+interface DataProviderContextProps {
+  dataSources: DataSourceObject;
+  setDataSource: (key: string, dataSource: BaseDataSource<any>) => void;
+  addDataSource: (key: string, dataSource: BaseDataSource<any>) => void;
+  data: Record<string, any>;
+  loading: Record<string, boolean>;
+  error: Record<string, any>;
+  fetchData: (key: string, filter?: object) => Promise<void>;
+  subscribeToData: (key: string) => void;
+  subscriptions: Record<string, () => void>;
+  add: (key: string, item: any) => Promise<any>;
+  update: (key: string, data: any, id?: string) => Promise<any>;
+  set: (key: string, data: any, id?: string) => Promise<any>;
+  remove: (key: string, id?: string) => Promise<void>;
+} // TODO: implement?
 
 // Create a context for the data
-export const DataContext = createContext<any>(undefined);
+// eslint-disable-next-line react-refresh/only-export-components
+export const DataContext = createContext<DataProviderContextProps | undefined>(undefined);
 
 interface DataProviderProps {
   dataSources: DataSourceObject;
@@ -33,14 +35,14 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   const [dataSourcesState, setDataSourcesState] = useState(dataSources);
 
   const addDataSource = useCallback(
-    (key: string, newDataSource: DataSource<any>) => {
+    (key: string, newDataSource: BaseDataSource<any>) => {
       setDataSourcesState((prev) => ({ ...prev, [key]: newDataSource }));
     },
     [setDataSourcesState]
   );
 
-  const setDataSource = useCallback((key: string, dataSource: DataSource<any>) => {
-    setDataSourcesState((prev) => ({ ...prev, [key]: { ...prev[key], dataSource } }));
+  const setDataSource = useCallback((key: string, dataSource: BaseDataSource<any>) => {
+    setDataSourcesState((prev) => ({ ...prev, [key]: dataSource }));
   }, []);
 
   const getDataSource = useCallback(
@@ -53,7 +55,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   );
 
   const fetchData = useCallback(
-    async (key: string, filter?: object) => {
+    async (key: string, _filter?: FilterObject<any>) => {
       if (subscriptions[key]) return; // Skip if there is an active subscription
       setLoading((prev) => ({ ...prev, [key]: true }));
       setError((prev) => ({ ...prev, [key]: null }));
@@ -61,7 +63,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
         const dataSource = getDataSource(key);
         const result =
           dataSource.options?.targetMode === 'collection'
-            ? await dataSource.getAll(filter)
+            ? await dataSource.getAll() // TODO: add filter
             : await dataSource.get();
         setData((prev) => ({ ...prev, [key]: result }));
       } catch (err) {
@@ -107,7 +109,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   );
 
   const update = useCallback(
-    async (key: string, data: any, id: string) => {
+    async (key: string, data: any, id?: string) => {
       const dataSource = getDataSource(key);
       const newData = await dataSource.update(data, id);
       if (!subscriptions[key] && data[key]) {
@@ -123,7 +125,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   );
 
   const set = useCallback(
-    async (key: string, data: any, id: string) => {
+    async (key: string, data: any, id?: string) => {
       const dataSource = getDataSource(key);
       await dataSource.set(data, id);
       if (!subscriptions[key] && data[key]) {
@@ -137,7 +139,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   );
 
   const remove = useCallback(
-    async (key: string, id: string) => {
+    async (key: string, id?: string) => {
       const dataSource = getDataSource(key);
       await dataSource.delete(id);
       if (!subscriptions[key] && data[key]) {
@@ -154,6 +156,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     return () => {
       Object.values(subscriptions).forEach((unsubscribe) => unsubscribe());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

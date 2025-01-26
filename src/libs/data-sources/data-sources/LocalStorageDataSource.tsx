@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { DataSourceInitOptions } from '..';
 import BaseDataSource from './BaseDataSource';
 
@@ -7,13 +6,14 @@ interface LocalStorageDataSourceProviderConfig {
   storageType?: 'localStorage' | 'sessionStorage';
 }
 
-export class LocalStorageDataSource extends BaseDataSource {
+export class LocalStorageDataSource<T> extends BaseDataSource<T> {
   storageKey: string;
   storage: Storage;
-  subscribers: ((data: any) => void)[] = [];
+  //subscribers: ((data: any) => void)[] = [];
+  // subscribers: Array<(data: T | null) => void> = [];
 
   constructor(
-    options: DataSourceInitOptions,
+    options: DataSourceInitOptions<T>,
     providerConfig?: LocalStorageDataSourceProviderConfig
   ) {
     super(options, providerConfig);
@@ -39,50 +39,58 @@ export class LocalStorageDataSource extends BaseDataSource {
     window.dispatchEvent(new Event('local-storage'));
   }
 
-  // Notify all subscribers with the latest data
-  private notifySubscribers(data: T): void {
-    this.subscribers.forEach((callback) => callback(data));
-  }
+  // // Notify all subscribers with the latest data
+  // private notifySubscribers(data: T): void {
+  //   console.log('notifySubscribers', data);
+  //   this.subscribers.forEach((callback) => callback(data));
+  // }
 
   // Get a single item by ID
   async get(id?: string): Promise<T | null> {
+    await super.get(id);
     const data = this.getData();
     if (this.options?.targetMode === 'document') {
       return data;
     }
-    if (!id) throw new Error('ID is required for collection types');
+    // if (!id) throw new Error('ID is required for collection types');
     return data[id] || null;
   }
 
   // Get all items, with optional filters
   async getAll(filter: { [key: string]: any } = {}): Promise<T[]> {
+    await super.getAll(filter);
     const data = this.getData();
     if (this.options?.targetMode === 'document') {
       return [data];
     }
     const items = Object.keys(data).map((key) => ({ id: key, ...data[key] }));
-    return items.filter((item) => {
-      return Object.keys(filter).every((key) => item[key] === filter[key]);
-    });
+    // return items.filter((item) => {
+    //   return Object.keys(filter).every((key) => item[key] === filter[key]);
+    // });
+    return items;
   }
 
   // Add a new item
   async add(item: T): Promise<T> {
-    this.validate(item);
+    await super.add(item);
+    // this.validate(item);
     if (this.options?.targetMode === 'document') {
       this.saveData(item);
       return item;
     }
     const data = this.getData() || [];
-    const id = new Date().getTime().toString(); // Generate a simple unique ID
-    data.push({ id, ...item });
+    if (!data[this.options.idField]) {
+      item[this.options.idField] = this.generateNanoId();
+    }
+    data.push(item);
     this.saveData(data);
-    return { id, ...item };
+    return item;
   }
 
   // Update an existing item by ID
   async update(data?: T, id: any): Promise<void> {
-    this.validate(data);
+    await super.update(data, id);
+    // this.validate(data);
     if (this.options?.targetMode === 'document') {
       const newData = id ? { ...this.getData(), ...id } : { ...this.getData(), ...data };
       this.saveData(newData);
@@ -100,7 +108,8 @@ export class LocalStorageDataSource extends BaseDataSource {
 
   // Set an existing item by ID
   async set(data?: T, id?: any): Promise<void> {
-    this.validate(data);
+    await super.set(data, id);
+    // this.validate(data);
     if (this.options?.targetMode === 'document') {
       this.saveData(data);
       return;
@@ -122,6 +131,7 @@ export class LocalStorageDataSource extends BaseDataSource {
 
   // Delete an item by ID
   async delete(id?: string): Promise<void> {
+    await super.delete(id);
     if (this.options?.targetMode === 'document') {
       this.storage.removeItem(this.storageKey);
       window.dispatchEvent(new Event('local-storage'));

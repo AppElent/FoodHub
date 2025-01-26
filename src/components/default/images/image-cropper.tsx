@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import useIsMobile from '@/hooks/use-is-mobile';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -30,7 +28,7 @@ async function convertImageToDataURL(url: string): Promise<string> {
   const blob = await response.blob();
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => resolve(reader.result as string);
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
@@ -69,7 +67,7 @@ const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: Imag
     return path.split('/').pop() || 'unknown-filename.jpg';
   };
 
-  const onCropComplete = useCallback((_, croppedAreaPixels: any) => {
+  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
@@ -77,7 +75,7 @@ const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: Imag
     if (imageUrl && croppedAreaPixels) {
       const croppedImageBlob = await getCroppedImg(imageUrl, croppedAreaPixels);
 
-      const croppedFile = new File([croppedImageBlob], getFileName(filename), {
+      const croppedFile = new File([croppedImageBlob as Blob], getFileName(filename), {
         type: 'image/jpeg',
       });
       const croppedFileUrl = await onSave(croppedFile, filename);

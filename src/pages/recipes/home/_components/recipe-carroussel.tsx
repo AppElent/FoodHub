@@ -1,5 +1,5 @@
 import useIsMobile from '@/hooks/use-is-mobile';
-import { Recipe } from '@/schemas/recipe';
+import { Recipe } from '@/schemas/recipe/recipe';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Box, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';

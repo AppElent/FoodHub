@@ -1,7 +1,7 @@
 import { getPath } from '@/config/paths';
 import { usePopover } from '@/hooks/use-popover';
 import useRouter from '@/hooks/use-router';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
