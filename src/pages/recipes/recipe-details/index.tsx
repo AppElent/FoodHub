@@ -9,12 +9,7 @@ const RecipeDetailsPage = () => {
   const recipe = useParamItem<Recipe>({
     items: recipes || [],
   }) as Recipe;
-  //   console.log(recipes, recipe);
-  //   const location = useLocation();
-  //   const navigate = useNavigate();
 
-  //   // Determine if we came from "My Recipes" or "Recipes"
-  //   const isFromMyRecipes = location.state?.from === '/myrecipes';
   const options = {
     recipeDetails: {
       getLabel: () => recipe.name,

@@ -19,8 +19,6 @@ import Rating from '@/libs/forms/components/Rating';
 import SubmitButton from '@/libs/forms/components/SubmitButton';
 import TextField from '@/libs/forms/components/TextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
-import { getCuisineSuggestions, getKeywordSuggestions } from '@/libs/recipes/get-recipe-fields';
-import parseExternalRecipeData from '@/libs/recipes/parse-external-recipe-data';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { ExternalRecipe } from '@/schemas/recipes/external-recipe';
 import { createRecipeSchema, Recipe, recipeYupSchema } from '@/schemas/recipes/recipe';
@@ -105,8 +103,14 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
 
   // Get fields and suggestions
   const fields = useMemo(() => createRecipeSchema().getFieldDefinitions(), []);
-  const keywordSuggestions = useMemo(() => recipes && getKeywordSuggestions(recipes), [recipes]);
-  const cuisineSuggestions = useMemo(() => recipes && getCuisineSuggestions(recipes), [recipes]);
+  const keywordSuggestions = useMemo(
+    () => recipes && createRecipeSchema().getKeywordsSuggestions(recipes),
+    [recipes]
+  );
+  const cuisineSuggestions = useMemo(
+    () => recipes && createRecipeSchema().getCuisineSuggestions(recipes),
+    [recipes]
+  );
 
   // Get formik instance ref
   const formik = useCustomFormik({
@@ -182,7 +186,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
       if (externalRecipeData && externalRecipeData.status === 'success') {
         formik.setValues({
           ...formik.values,
-          ...parseExternalRecipeData(externalRecipeData.data),
+          // ...parseExternalRecipeData(externalRecipeData.data),
         });
       }
       //formik.handleSubmit();

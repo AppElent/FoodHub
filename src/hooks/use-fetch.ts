@@ -35,7 +35,6 @@ function useFetch<T = unknown>(
         const response = await fetch(urlToFetch as string, fetchOptions);
         if (!response.ok) {
           const responseJson = await response.json();
-          console.log(responseJson);
           throw new Error(responseJson.message);
         }
         const result: T = await response.json();

@@ -43,7 +43,7 @@ interface UseLoginFormReturn {
 
 interface UseLoginFormOptions {
   redirectAfterLogin?: string;
-  mode?: string
+  mode?: string;
 }
 
 const useLoginForm = (
@@ -51,7 +51,7 @@ const useLoginForm = (
   options?: UseLoginFormOptions
 ): UseLoginFormReturn => {
   const setIsSignUpMode = (_isSignUpMode: boolean) => {};
-  const {mode = 'signin', redirectAfterLogin} = options || {};
+  const { mode = 'signin', redirectAfterLogin } = options || {};
   const isSignUpMode = mode === 'signup';
 
   // Get search params and search for query variable
@@ -91,12 +91,8 @@ const useLoginForm = (
           await authProvider.signIn(values.email, values.password);
         }
 
-                const redirectUrl = returnTo
-          ? returnTo
-          : redirectAfterLogin
-            ? redirectAfterLogin
-            : '/';
-            navigate(redirectUrl);
+        const redirectUrl = returnTo ? returnTo : redirectAfterLogin ? redirectAfterLogin : '/';
+        navigate(redirectUrl);
       } catch (err: any) {
         setErrors({ submit: err.message });
       } finally {

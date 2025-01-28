@@ -1,29 +1,29 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
 import {
+  Autocomplete,
+  Checkbox,
+  IconButton,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Toolbar,
-  Typography,
-  Paper,
-  Checkbox,
   TextField,
-  Select,
-  MenuItem,
-  Autocomplete,
-  IconButton,
+  Toolbar,
   Tooltip,
-  Stack,
+  Typography,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import SaveIcon from '@mui/icons-material/Save';
+import { useFormik } from 'formik';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import * as Yup from 'yup';
 
 /**
  * CustomTable component to display a table with editable rows, add, delete, and save functionalities.
@@ -94,8 +94,6 @@ const CustomTable = ({
       submitProps.resetForm({ values });
     },
   });
-
-  console.log(formik);
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {

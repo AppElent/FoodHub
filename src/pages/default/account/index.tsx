@@ -1,6 +1,5 @@
 import { AppConfig, setLogLevel } from '@/config';
 import useAuth from '@/libs/auth/use-auth';
-import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { Button, Card, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPage from '../DefaultPage';
 import DebugCard from './components/debug-card';
@@ -9,19 +8,15 @@ import ProfileCard from './components/profile-card';
 
 const Account = () => {
   const auth = useAuth({ redirectUnauthenticated: true });
-  const formik = useCustomFormik({
-    initialValues: {
-      email: '',
-      password: '',
-    },
-    onSubmit: async (values) => {
-      console.log('submit', values);
-    },
-  });
-
-  console.log(auth);
-
-  console.log('formik', formik);
+  // const formik = useCustomFormik({
+  //   initialValues: {
+  //     email: '',
+  //     password: '',
+  //   },
+  //   onSubmit: async (values) => {
+  //     console.log('submit', values);
+  //   },
+  // });
 
   return (
     <DefaultPage>
@@ -47,7 +42,6 @@ const Account = () => {
         >
           <PasswordCard
             setPassword={async (oldPassword, newPassword) => {
-              console.log(oldPassword, newPassword);
               await auth.updatePassword?.(oldPassword, newPassword);
             }}
           />

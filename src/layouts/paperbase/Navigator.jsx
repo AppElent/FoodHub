@@ -74,7 +74,6 @@ const itemCategory = {
 
 export default function Navigator(props) {
   const auth = useAuth();
-  console.log(auth);
   const handleClick = (id) => {
     setOpen((prevOpen) => ({ ...prevOpen, [id]: !prevOpen[id] }));
   };

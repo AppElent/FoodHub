@@ -9,7 +9,6 @@ interface Settings {
 
 const Settings = () => {
   const settings = useData<Settings, Settings>('settings');
-  console.log(settings);
 
   return (
     <DefaultPaperbasePage title="Settings">

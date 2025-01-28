@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles';
-import Quill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import Quill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { FieldConfig, useFormField } from '..';
 
 // For some unknown reason, styling Quill directly throws an error.

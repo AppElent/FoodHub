@@ -57,61 +57,6 @@ const useTabs = (tabsData: TabData[], options?: TabOptions) => {
     [setTab]
   );
 
-  // const newTabsData = useMemo(() => {
-  //   return tabsData.map((tab, index) => ({
-  //     ...tab,
-  //     component: tab.component && (
-  //       <TabPanel
-  //         key={tab.value}
-  //         value={tab.value}
-  //         index={index}
-  //         currentTab={currentTab}
-  //       >
-  //         {tab.component}
-  //       </TabPanel>
-  //     ),
-  //   }));
-  // }, [tabsData]); //TODO: fix
-
-  // const getValue = () => {
-  //   if (queryParamName) {
-  //     // If there is a query param named tab then set that tab
-  //     const urlParams = new URLSearchParams(window.location.search);
-  //     return urlParams.get(queryParamName);
-  //   } else if (initialData) {
-  //     return initialData;
-  //   } else {
-  //     if (tabsData && tabsData.length > 0) {
-  //       return tabsData[0].value;
-  //     }
-  //   }
-  // };
-  // const [tab, setTab] = useState(getValue());
-  // // TODO: fix this hook
-  // const [query, setQuery] = [
-  //   '',
-  //   (value: any) => {
-  //     console.log(value);
-  //   },
-  // ];
-
-  // useEffect(() => {
-  //   if (queryParamName) {
-  //     // If there is a query param named tab then set that tab
-  //     if (query) {
-  //       setTab(query);
-  //     }
-  //   }
-  // }, [queryParamName, query]);
-
-  // const handleTabChange = useCallback((_e: any, newValue: any) => {
-  //   if (queryParamName && setQuery) {
-  //     setQuery(newValue);
-  //   } else {
-  //     setTab(newValue);
-  //   }
-  // }, []);
-
   return { tab: currentTab, handleTabChange, setTab, tabsData };
 };
 

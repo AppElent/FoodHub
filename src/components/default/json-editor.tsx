@@ -35,19 +35,10 @@ const JsonEditor = (props: { data: any; options?: Partial<JsonEditorProps> }) =>
 
   const handleAdd = (data: InteractionProps) => {
     validationSchema?.validate(data);
-    console.log('handleAdd', data);
   };
 
   return (
     <div>
-      {/* <JsonEditorExternal
-        data={data}
-        setData={(alldata: any) => console.log(alldata)} // optional
-        theme={['githubLight']}
-        restrictDrag={false}
-        restrictDelete={false}
-        collapse={true}
-      /> */}
       <ReactJson
         src={data}
         {...jsonEditorOptions}

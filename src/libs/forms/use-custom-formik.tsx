@@ -84,16 +84,6 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
     await formik.handleSubmit(e);
   };
 
-  // Overwrite default formik handleChange with a debounced version
-  // const debouncedHandleChange = useMemo(
-  //   () =>
-  //     _.debounce((value) => {
-  //       console.log('test');
-  //       formik.handleChange(value);
-  //     }, 500),
-  //   [formik.handleChange]
-  // );
-
   return { ...formik, handleSubmit: customHandleSubmit };
 };
 

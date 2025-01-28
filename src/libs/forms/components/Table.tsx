@@ -58,11 +58,7 @@ const Table = ({ name, field: fieldConfig, tableOptions }: TableProps) => {
   const fieldName = name || fieldConfig?.name;
   const data = useFormField(fieldName as string);
   const { field, helpers } = data;
-  // const mergedTableOptions = _.merge({}, defaultTableOptions, tableOptions);
-  // const { template, getTemplate } = mergedTableOptions;
-  // console.log(template, getTemplate);
 
-  // const { editable, selectable, columns = {}, title } = fieldConfig?.custom?.table || {};
   // Merge tableOptions with fieldConfig.custom.table
   const mergedTableOptions = _.merge(
     {},
@@ -71,13 +67,6 @@ const Table = ({ name, field: fieldConfig, tableOptions }: TableProps) => {
     tableOptions
   );
   const { template, getTemplate, editable, selectable, columns = {}, title } = mergedTableOptions;
-  console.log(mergedTableOptions);
-
-  // useEffect(() => {
-  //     if (field.value.length === 0) {
-  //         helpers.push({});
-  //     }
-  // }, [])
 
   const handleDeleteRows = () => {
     const newValues = field.value.filter((_: any, index: number) => !selected.includes(index));
@@ -87,10 +76,6 @@ const Table = ({ name, field: fieldConfig, tableOptions }: TableProps) => {
   };
 
   const renderCell = (_row: any, index: number, fieldDefinition: FieldConfig) => {
-    // if (fieldDefinition.render) {
-    //   return fieldDefinition.render(row[fieldDefinition?.id]);
-    // } else  // TODO: Implement
-
     if (fieldDefinition.definition === 'select') {
       return (
         <Select
@@ -114,12 +99,6 @@ const Table = ({ name, field: fieldConfig, tableOptions }: TableProps) => {
       />
     );
   };
-
-  console.log(columns, getTemplate());
-
-  // const handleDeleteRow = (rowId: number) => {
-  //   setRows(rows.filter((row: any) => row.id !== rowId));
-  // };
 
   return (
     <FieldArray name={fieldName as string}>

@@ -39,12 +39,6 @@ export class LocalStorageDataSource<T> extends BaseDataSource<T> {
     window.dispatchEvent(new Event('local-storage'));
   }
 
-  // // Notify all subscribers with the latest data
-  // private notifySubscribers(data: T): void {
-  //   console.log('notifySubscribers', data);
-  //   this.subscribers.forEach((callback) => callback(data));
-  // }
-
   // Get a single item by ID
   async get(id?: string): Promise<T | null> {
     await super.get(id);
@@ -64,9 +58,6 @@ export class LocalStorageDataSource<T> extends BaseDataSource<T> {
       return [data];
     }
     const items = Object.keys(data).map((key) => ({ id: key, ...data[key] }));
-    // return items.filter((item) => {
-    //   return Object.keys(filter).every((key) => item[key] === filter[key]);
-    // });
     return items;
   }
 

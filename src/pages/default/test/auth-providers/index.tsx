@@ -15,7 +15,6 @@ const authProviders: { [key: string]: any } = {
 const AuthProvider = (props: { providerName: string }) => {
   const loginForm = useLoginForm(authProviders[props.providerName], { mode: 'signin' });
   const { providerName } = props;
-  console.log(props, providerName, loginForm);
   const user = authProviders[providerName].getCurrentUser();
   return (
     <Card>

@@ -65,11 +65,6 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
                       <QueryParamProvider adapter={ReactRouter6Adapter}>
                         <ConfirmProvider>
                           <Seo />
-                          {/* <IssueDialog
-                          onSave={(values) => console.log(values)}
-                          open={dialog.isOpen}
-                          onClose={() => dialog.close()}
-                        /> */}
                           <ToastContainer
                             position="top-right"
                             autoClose={2500}

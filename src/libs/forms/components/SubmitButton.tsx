@@ -17,7 +17,6 @@ const SubmitButton = (props: ButtonProps) => {
       disabledText = 'No changes to save';
     } else if (!formik.isValid) {
       disabledText = 'Form is invalid.\n\n';
-      console.log(formik.errors);
       Object.keys(formik.errors).forEach((key) => {
         disabledText += `${(formik.errors as Record<string, any>)[key]}\n`;
       });

@@ -1,15 +1,8 @@
-// import { Outlet, RouteObject } from 'react-router-dom';
-
-// import PaperbaseLayout from '@/layouts/paperbase/Layout';
-// import HomePage from '@/pages/home';
-// import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
-// import RecipeDetailsPage from '@/pages/recipes/recipe-details';
-// import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import appRoutes from '@/routes/appRoutes';
 import { Home as HomeIcon } from '@mui/icons-material';
 import FlatwareIcon from '@mui/icons-material/Flatware';
+import { JSX } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
-//import { PathItem } from './paths';
 
 export type CustomRouteObject = RouteObject & {
   id: string;
@@ -99,9 +92,6 @@ export const routes: CustomRouteObject[] = [
   },
   //   ...defaultRoutes,
 ];
-
-// const routes2 = generateRouteObjects(routes);
-// console.log('ROUTES', routes2);
 
 export const paths = getAllPaths(routes);
 

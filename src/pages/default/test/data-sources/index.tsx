@@ -119,7 +119,6 @@ const DataSource = (props: any) => {
 
   const handleAdd = async () => {
     const newItem = createDummySchema().generateTestData(); //getDummyTestData(1) as Dummy;
-    console.log('newitem', newItem);
     await datasource.actions.add(newItem);
   };
 

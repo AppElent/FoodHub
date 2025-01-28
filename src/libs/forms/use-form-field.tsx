@@ -62,7 +62,6 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
   // If meta.error is a string, return, otherwise translate the error
   let newError: any = meta.error;
   if (newError && !(typeof newError === 'string')) {
-    console.log(newError);
     newError = t(newError?.key, { ...newError?.values, field: label });
   }
   const newMeta = {

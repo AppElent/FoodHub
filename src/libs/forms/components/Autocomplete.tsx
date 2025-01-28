@@ -41,7 +41,6 @@ const Autocomplete = ({ name, field: fieldConfig, ...props }: AutocompleteChipLi
 
   // TODO: should be unique? getOptionDisabled={(option) => field.value.includes(option)}
 
-  console.log(field.value);
   const selectedOption = fieldConfig?.options?.find((option: any) => option.key === field.value);
 
   return (

@@ -137,7 +137,6 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
 
       // Parse filter object
       const filterObject = filter || this.options.targetFilter || {};
-      //console.log(filterObject, filter, this.options.targetFilter);
       const { provider: query, postFilter } = this.#parseFilters(filterObject);
 
       const querySnapshot = await getDocs(query);

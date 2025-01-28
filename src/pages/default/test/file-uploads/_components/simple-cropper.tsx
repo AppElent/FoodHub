@@ -1,16 +1,13 @@
 import ImageCropper from '@/components/default/images/image-cropper';
 import useDialog from '@/hooks/use-dialog';
-import useAuth from '@/libs/auth/use-auth';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 
 const SimpleCropper = ({ filename }: { filename: string }) => {
   const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
-  const auth = useAuth();
   const dialog = useDialog();
   const [imageUrl, setImageUrl] = useState<string>();
-  console.log(auth);
   const [url, setUrl] = useState('');
 
   return (
@@ -28,11 +25,8 @@ const SimpleCropper = ({ filename }: { filename: string }) => {
         imageUrl={url}
         filename={filename}
         onSave={async (file, path) => {
-          console.log(path, file);
           // Save the original file to storage
           const originalFileUrl = await storageClass.uploadFile(file, filename);
-          //console.log('Original file uploaded:', originalFileUrl);
-          // update state with the type url
           //setImageUrl((prev: any) => ({ ...prev, [type]: originalFileUrl }));
           setImageUrl(originalFileUrl);
           return originalFileUrl;

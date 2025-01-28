@@ -19,10 +19,8 @@ const Errors = ({ fields }: { fields: { [key: string]: FieldConfig } }) => {
       ? t(fieldConfig?.translationKey, { defaultValue: fieldConfig?.label || name })
       : fieldConfig?.label || name;
     // If meta.error is a string, return, otherwise translate the error
-    console.log('label', label, fieldConfig, key, fields.fields);
     let newError: any = formik.errors[key];
     if (newError && !(typeof newError === 'string')) {
-      console.log(newError);
       newError = t(newError?.key, { ...newError?.values, field: label });
     }
     return newError;

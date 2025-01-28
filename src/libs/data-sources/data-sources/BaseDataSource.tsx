@@ -31,6 +31,7 @@ class BaseDataSource<T, Z = T[]> {
   private converter = {
     toDatabase: (data: T): any => data,
     fromDatabase: (data: any): T => data,
+    //preDelete: (id: string) => any //TODO: implement preDelete
   };
   defaultValue: any = null;
   providerConfig: any;

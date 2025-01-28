@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import Tabs from './tabs';
 
 // Tabs data

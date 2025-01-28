@@ -3,6 +3,7 @@ import GridLayout from '@/components/default/ui/grid-layout';
 import LoadingButton from '@/components/default/ui/loading-button';
 import { getLogLevel } from '@/config';
 import usePathRouter from '@/hooks/use-path-router';
+import useQueryParamAction from '@/hooks/use-query-param-action';
 import useAuth from '@/libs/auth/use-auth';
 import { useData } from '@/libs/data-sources';
 import { CustomForm } from '@/libs/forms';
@@ -16,31 +17,55 @@ import Rating from '@/libs/forms/components/Rating';
 import SubmitButton from '@/libs/forms/components/SubmitButton';
 import TextField from '@/libs/forms/components/TextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
-import { getCuisineSuggestions, getKeywordSuggestions } from '@/libs/recipes/get-recipe-fields';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { createRecipeSchema, Recipe, recipeYupSchema } from '@/schemas/recipes/recipe';
 import { Box, Button, CardActions, Grid, Typography } from '@mui/material';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface RecipeEditDialogProps {
   recipe?: Recipe | null;
+  //saveRecipe: (recipe: Recipe, id: string) => Promise<Recipe>;
+}
+
+interface externalDataActionInterface {
+  loading: boolean;
+  error: string | null;
 }
 
 const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
   //   const formik = useFormikContext<Recipe>();
-  const auth = useAuth();
+  const auth = useAuth({ redirectUnauthenticated: true });
   // Translation
   const { t } = useTranslation();
+  // Loading external data state
+  const [externalDataAction, setExternalDataAction] = useState<externalDataActionInterface>({
+    loading: false,
+    error: null,
+  });
+
+  // If formik.values.owner is set, it should be the same as currentuser
+  useEffect(() => {
+    if (
+      auth.user &&
+      formik.values.owner &&
+      formik.values.owner !== auth.user.id &&
+      formik.values.owner !== ''
+    ) {
+      router.push('recipes');
+    }
+  });
 
   const { data: recipes, actions: recipeActions } = useData<Recipe>('recipes');
-  const { set: addRecipe, delete: deleteRecipe } = recipeActions;
+  const { set: setRecipe } = recipeActions;
 
   const initialValues = useMemo(() => {
+    const recipeValues = recipe || createRecipeSchema().getTemplate();
     return {
+      ...recipeValues,
       owner: auth.user?.id,
     };
-  }, [auth.user]);
+  }, [auth.user, recipe]);
 
   // Get formik instance ref
   const formik = useCustomFormik({
@@ -49,7 +74,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     enableReinitialize: true,
     onSubmit: async (values: Recipe) => {
       // Save data
-      const savedRecipe = await addRecipe(values);
+      const savedRecipe = await setRecipe(values, values.id);
       const recipeId = savedRecipe.id;
 
       const filesToUpload = formik.values.images.filter((url: string) => url.startsWith('blob:'));
@@ -93,6 +118,61 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
       //onClose();
     },
   });
+
+  // Receive url query param and fetch recipe data
+  useQueryParamAction('url', (url) => {
+    const fetchDataAndUpdateFormik = async () => {
+      try {
+        setExternalDataAction({ loading: true, error: null });
+        await formik.setFieldValue('url', url);
+        const recipeData = await createRecipeSchema().fetchExternalData(url);
+        console.log('RECIPEDATA', recipeData);
+        formik.setValues({
+          ...formik.values,
+          ...recipeData,
+        });
+      } catch (e: any) {
+        console.error(e);
+        setExternalDataAction({ loading: false, error: e.message });
+      } finally {
+        setExternalDataAction({ loading: false, error: externalDataAction.error });
+      }
+      //await fetchData(`https://api-python.appelent.site/recipes/scrape?url=${url}`);
+    };
+    if (url && formik.values.url !== url && !externalDataAction.loading) {
+      //TODO: check if valid url using formik
+      fetchDataAndUpdateFormik();
+    }
+  });
+
+  // // Fetch recipe data from api
+  // const {
+  //   data: externalRecipeData,
+  //   loading,
+  //   error: fetchUrlError,
+  //   fetchData,
+  // } = useFetch<{ status: string; data: ExternalRecipe }>(
+  //   `https://api-python.appelent.site/recipes/scrape?url=${formik?.values.url}`,
+  //   {
+  //     autoFetch: false,
+  //   }
+  // );
+
+  // useEffect(() => {
+  //   if (externalRecipeData) {
+  //     if (externalRecipeData && externalRecipeData.status === 'success') {
+  //       formik.setValues({
+  //         ...formik.values,
+  //         ...parseExternalRecipeData(externalRecipeData.data),
+  //       });
+  //     }
+  //     //formik.handleSubmit();
+  //   }
+  // }, [externalRecipeData]); //TODO: just a normal fetch function and error in state
+
+  useEffect(() => {
+    console.log('FORMIK', formik);
+  }, [formik.values]);
 
   //   // Generate new ID
   //   const id = useGuid();
@@ -144,15 +224,21 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
 
   // Get fields and suggestions
   const fields = useMemo(() => createRecipeSchema().getFieldDefinitions(), []);
-  const keywordSuggestions = useMemo(() => recipes && getKeywordSuggestions(recipes), [recipes]);
-  const cuisineSuggestions = useMemo(() => recipes && getCuisineSuggestions(recipes), [recipes]);
+  const keywordSuggestions = useMemo(
+    () => recipes && createRecipeSchema().getKeywordsSuggestions(recipes),
+    [recipes]
+  );
+  const cuisineSuggestions = useMemo(
+    () => recipes && createRecipeSchema().getCuisineSuggestions(recipes),
+    [recipes]
+  );
 
-  useEffect(() => {
-    // Temp to fix yields
-    if (typeof formik?.values?.yields === 'string') {
-      formik.setFieldValue('yields', undefined);
-    }
-  }, [formik?.values?.yields]);
+  // useEffect(() => {
+  //   // Temp to fix yields
+  //   if (typeof formik?.values?.yields === 'string') {
+  //     formik.setFieldValue('yields', undefined);
+  //   }
+  // }, [formik?.values?.yields]);
 
   //   // Conditions for disabling submit button
   //   const disableSubmit =
@@ -172,9 +258,9 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               variant: 'outlined',
               multiline: true,
             },
-            muiRatingProps: {
-              size: 'large',
-            },
+            // muiRatingProps: {
+            //   size: 'large',
+            // },
           }}
         >
           <Image
@@ -182,7 +268,10 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
             field={fields.image}
           />
           <TextField field={fields.name} />
-          <Rating field={fields.score} />
+          <Rating
+            field={fields.score}
+            muiRatingProps={{ size: 'large' }}
+          />
           <Grid
             container
             spacing={2}
@@ -209,9 +298,13 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
                   <LoadingButton
                     variant="contained"
                     disabled={!!formik.errors.url || !formik.values.url}
-                    isLoading={loading}
-                    onClick={() => {
-                      fetchData();
+                    isLoading={externalDataAction.loading}
+                    onClick={async () => {
+                      const data = await createRecipeSchema().fetchExternalData(formik.values.url);
+                      formik.setValues({
+                        ...formik.values,
+                        ...data,
+                      });
                     }}
                   >
                     {t('foodhub:pages.edit-recipe.get-recipe-information')}
@@ -220,12 +313,12 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               )}
             </Grid>
           </Grid>
-          {fetchUrlError && (
+          {externalDataAction.error && (
             <Typography
               color="error"
               gutterBottom
             >
-              {fetchUrlError}
+              {externalDataAction.error}
             </Typography>
           )}
 
@@ -258,10 +351,11 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               const storageClass = new FirebaseStorageProvider();
               const url = await storageClass.uploadFile(
                 file,
-                `uploads/recipes/${recipeId}/${file.name}`
+                `uploads/recipes/${recipe?.id}/${file.name}`
               );
               return url;
             }}
+            // TODO: action array
             deleteImage={async (url) => {
               const storageClass = new FirebaseStorageProvider();
               await storageClass.deleteFile(url);
@@ -288,7 +382,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
             {!!recipe && (
               <Button
                 onClick={() => {
-                  deleteRecipeAndImages(recipe.id);
+                  //deleteRecipeAndImages(recipe.id);
                   formik.resetForm();
                 }}
                 variant="outlined"

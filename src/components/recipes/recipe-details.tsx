@@ -1,5 +1,7 @@
-import useDialog from '@/hooks/use-dialog';
+import NoImageAvailable from '@/components/default/images/no-image-available';
+import ImageList from '@/components/default/ui/image-list';
 import useIsMobile from '@/hooks/use-is-mobile';
+import useRouter from '@/hooks/use-router';
 import useAuth from '@/libs/auth/use-auth';
 import { Recipe } from '@/schemas/recipes/recipe';
 import {
@@ -21,24 +23,17 @@ import {
   Typography,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import RecipeEditDialog from '../../sections/recipes/recipe-edit-dialog';
-import NoImageAvailable from '../default/images/no-image-available';
-import ImageList from '../default/ui/image-list';
 
 // TODO: add image viewer and set image as default
 
 const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
-  const dialog = useDialog();
   const { t } = useTranslation();
+  const router = useRouter();
   // Get user
   const { user } = useAuth();
 
   // is mobile
   const isMobile = useIsMobile();
-
-  const handleEdit = () => {
-    dialog.open();
-  };
 
   if (!recipe) {
     return <Paper>No recipe found</Paper>;
@@ -49,11 +44,6 @@ const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
       elevation={3}
       sx={{ overflow: 'hidden' }}
     >
-      <RecipeEditDialog
-        open={dialog.isOpen}
-        recipe={recipe}
-        onClose={() => dialog.close()}
-      />
       {recipe.image ? (
         <Box sx={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
           <Box
@@ -90,7 +80,8 @@ const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
               variant="contained"
               color="primary"
               startIcon={<EditIcon />}
-              onClick={handleEdit}
+              //onClick={handleEdit}
+              onClick={() => router.push('edit')}
             >
               {t('common:actions.edit')}
             </Button>

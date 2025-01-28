@@ -12,13 +12,11 @@ const ImageUploaderCard = ({
   const uploadFileAndShowThumbnail = (type: string) => async (file: File, fileName: string) => {
     // Save the original file to storage
     const originalFileUrl = await uploadFile(file, fileName);
-    //console.log('Original file uploaded:', originalFileUrl);
     // update state with the type url
     setImageUrl((prev: any) => ({ ...prev, [type]: originalFileUrl }));
     return originalFileUrl;
   };
 
-  console.log(imageUrl);
   return (
     <>
       <ImageUploader

@@ -32,13 +32,12 @@ const IssueDialog = () => {
     initialValues: { title: '', description: '' },
     validationSchema: issueYupSchema,
     onSubmit: async (values, _formikHelpers) => {
-      console.log(values);
       try {
         await datasource.actions.add(values);
-        toast.success(t('notifications.submitSuccess', { resource: 'Issue' }));
+        toast.success(t('common:notifications.submitSuccess', { resource: 'Issue' }));
         formik.resetForm();
       } catch (e) {
-        toast.error(t('notifications.submitError', { resource: 'Issue' }));
+        toast.error(t('common:notifications.submitError', { resource: 'Issue' }));
         console.error(e);
       }
     },

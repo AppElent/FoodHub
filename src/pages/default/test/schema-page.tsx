@@ -1,12 +1,15 @@
+import JsonEditor from '@/components/default/json-editor';
 import { createDummySchema } from '@/schemas/dummy';
 import DefaultPage from '../DefaultPage';
 
 const SchemaPage = () => {
   const schema = createDummySchema();
-  console.log(schema);
   const mockdata = schema.generateMockData();
-  console.log(mockdata);
-  return <DefaultPage></DefaultPage>;
+  return (
+    <DefaultPage>
+      <JsonEditor data={mockdata} />
+    </DefaultPage>
+  );
 };
 
 export default SchemaPage;

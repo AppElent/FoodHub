@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet-async';
 
 let titleSuffix;
 
@@ -12,11 +11,7 @@ export const Seo = (props) => {
 
   const fullTitle = titleSuffix ? (title ? title + ' | ' + titleSuffix : titleSuffix) : title;
 
-  return (
-    <Helmet>
-      <title>{fullTitle}</title>
-    </Helmet>
-  );
+  return <title>{fullTitle}</title>;
 };
 
 Seo.propTypes = {

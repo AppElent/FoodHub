@@ -18,8 +18,6 @@ const getNextFileName = ({ filenames, name }: { filenames: string[]; name: strin
 
   const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
 
-  console.log(name, numbers, nextNumber);
-
   // Format as zero-padded (e.g., 01, 02, ...)
   return `${name}${String(nextNumber).padStart(2, '0')}`;
 };

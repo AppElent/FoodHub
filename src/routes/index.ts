@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import { RouteObject } from 'react-router-dom';
 
 export type CustomRouteObject = RouteObject & {

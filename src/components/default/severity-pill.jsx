@@ -8,8 +8,6 @@ const SeverityPillRoot = styled('span')(({ theme, ownerState }) => {
       ? theme.palette[ownerState.color].main
       : theme.palette[ownerState.color].dark;
 
-  console.log(theme);
-
   return {
     alignItems: 'center',
     backgroundColor,

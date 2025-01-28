@@ -1,15 +1,16 @@
 import { FieldConfig } from '@/libs/forms';
 import useFormField from '@/libs/forms/use-form-field';
-import { Box, Rating as DRating, TextFieldProps, Typography } from '@mui/material';
+import { Box, Rating as DRating, RatingProps, Typography, TypographyProps } from '@mui/material';
 import _ from 'lodash';
 
-interface CustomTextFieldProps {
+interface CustomRatingProps {
   name?: string;
   field?: FieldConfig;
-  muiTextFieldProps?: TextFieldProps;
+  muiTypographyProps?: TypographyProps;
+  muiRatingProps?: RatingProps;
 }
 
-const Rating = ({ name, field: fieldConfig, ...props }: CustomTextFieldProps) => {
+const Rating = ({ name, field: fieldConfig, ...props }: CustomRatingProps) => {
   if (!name && !fieldConfig) {
     throw new Error('Either name or field must be provided');
   }
@@ -27,13 +28,8 @@ const Rating = ({ name, field: fieldConfig, ...props }: CustomTextFieldProps) =>
         value={field.value || 0}
         onChange={(_event, newValue) => {
           helpers.setValue(newValue);
-          // if (!options?.editMode) {
-          //   formik.handleSubmit();
-          // }
         }}
         precision={0.5}
-        // icon={<FavoriteIcon fontSize="inherit" />}
-        // emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
         {...(newProps?.muiRatingProps && newProps.muiRatingProps)}
       />
     </Box>

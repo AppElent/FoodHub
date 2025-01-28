@@ -1,14 +1,20 @@
-import { AppBar, Box, Button, Grid, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
-import HelpIcon from '@mui/icons-material/Help';
-import PropTypes from 'prop-types';
 import { Seo } from '@/components/default/seo';
 import TabSection from '@/components/default/tab-section';
 import config from '@/config';
+import HelpIcon from '@mui/icons-material/Help';
+import { AppBar, Box, Button, Grid, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 //import { OPTIONS } from '../../App';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
-const DefaultPaperbasePage = ({ title, tabs, buttons, children }) => {
+interface DefaultPaperbasePageProps {
+  title: string;
+  tabs?: any;
+  buttons?: any;
+  children: any;
+}
+
+const DefaultPaperbasePage = ({ title, tabs, buttons, children }: DefaultPaperbasePageProps) => {
   return (
     <>
       <Seo title={title} />
@@ -43,7 +49,7 @@ const DefaultPaperbasePage = ({ title, tabs, buttons, children }) => {
                 variant="outlined"
                 color="inherit"
                 onClick={() => {
-                  config.issueDialog.open();
+                  config?.issueDialog?.open(); //TODO: rework
                 }}
                 size="small"
               >
@@ -75,13 +81,6 @@ const DefaultPaperbasePage = ({ title, tabs, buttons, children }) => {
       </Box>
     </>
   );
-};
-
-DefaultPaperbasePage.propTypes = {
-  title: PropTypes.any,
-  tabs: PropTypes.any,
-  buttons: PropTypes.any,
-  children: PropTypes.any,
 };
 
 export default DefaultPaperbasePage;

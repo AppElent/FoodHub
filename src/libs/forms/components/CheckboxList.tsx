@@ -62,25 +62,10 @@ const CheckboxList = ({ name, field: fieldConfig, options }: CustomCheckboxListP
   // spread options
   const { search, selectAll, selectNone, inverted } = _.merge({}, defaultOptions, options);
 
-  console.log(fieldName, name, fieldConfig, options);
-
   const optionList = fieldConfig?.options || [];
   const checkedItems = useMemo(() => {
     return new Set(field.value || []);
   }, [field.value]);
-  console.log(checkedItems, field.value, field.checked);
-  //const [checkedItems, setCheckedItems] = useState(new Set(field.value || []));
-
-  // useEffect(() => {
-  //   const newCheckedItems = new Set(field.value || []);
-  //   if (!_.isEqual(Array.from(newCheckedItems), Array.from(checkedItems))) {
-  //     setCheckedItems(newCheckedItems);
-  //   }
-  // }, [field.value, checkedItems]);
-
-  // const label = fieldConfig?.translationKey
-  //   ? t(fieldConfig?.translationKey, { defaultValue: fieldConfig?.label || fieldName })
-  //   : fieldConfig?.label || name;)
 
   const handleToggle = (key: string) => {
     const newCheckedItems = new Set(field.value || []);
@@ -167,7 +152,6 @@ const CheckboxList = ({ name, field: fieldConfig, options }: CustomCheckboxListP
             if (inverted) {
               isChecked = !isChecked;
             }
-            // console.log(item.key, isChecked, inverted);
             return isChecked;
           };
           itemIsChecked();
