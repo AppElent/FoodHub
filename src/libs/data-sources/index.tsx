@@ -20,16 +20,6 @@ export interface DataSourceInitOptions<T, Z = T[]> {
     createdAt?: string;
     updatedAt?: string;
   };
-  // cleanValues?: {
-  //   removeUndefined?: boolean;
-  // };
-  // mock?: boolean; //TODO: implement OR delete
-  // mockOptions?: {
-  //   count?: number;
-  //   schema?: {
-  //     [key: string]: () => any;
-  //   };
-  // };
   converter?: {
     toDatabase: (data: T) => any;
     fromDatabase: (data: any) => T;

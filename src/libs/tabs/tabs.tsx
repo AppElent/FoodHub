@@ -1,8 +1,8 @@
-import useTabs, { TabOptions } from '@/hooks/use-tabs';
 import { Box, BoxProps, TabsProps as DTabsProps, TabProps, useTheme } from '@mui/material';
 import { TabData } from '.';
 import TabPanel from './tab-panel';
 import TabsHeader from './tabs-header';
+import useTabs, { TabOptions } from './use-tabs';
 
 interface TabsProps {
   tabOptions?: TabOptions;

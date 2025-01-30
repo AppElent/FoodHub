@@ -70,6 +70,8 @@
   "menu": {
     "recipes": "Recipes",
     "allrecipes": "All Recipes",
-    "myRecipes": "My Recipes"
+    "myRecipes": "My Recipes",
+    "foodtracker": "Food Tracker",
+    "favorites": "Favorites"
   }
 }

@@ -1,28 +1,25 @@
 import SearchBar from '@/components/default/ui/search-bar';
 import RecipeOverviewGalleryView from '@/components/recipes/recipe-gallery-view';
-import useDialog from '@/hooks/use-dialog';
 
 import useIsMobile from '@/hooks/use-is-mobile';
-import useQueryParamAction from '@/hooks/use-query-param-action';
 import useRouter from '@/hooks/use-router';
 import useFilter from '@/libs/filters/use-filter';
 import { Recipe } from '@/schemas/recipes/recipe';
-import RecipeEditDialog from '@/sections/recipes/recipe-edit-dialog';
-import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
-import { Fab, FormControl, Grid, MenuItem, Stack, TextField } from '@mui/material';
+import { FormControl, Grid, MenuItem, Stack, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
+import FloatingButton from '../default/floating-button';
 import RecipeOverviewListView from './recipe-list-view';
 
 function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
   const [view /*, setView*/] = useState('gallery');
-  const dialog = useDialog({ queryKey: 'recipe' });
-  useQueryParamAction(
-    'url',
-    (_url) => {
-      dialog.open('new');
-    },
-    { removeAfterAction: false }
-  );
+  //const dialog = useDialog({ queryKey: 'recipe' });
+  // useQueryParamAction(
+  //   'url',
+  //   (_url) => {
+  //     dialog.open('new');
+  //   },
+  //   { removeAfterAction: false }
+  // );
 
   const router = useRouter();
 
@@ -31,8 +28,8 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
 
   const handleAddRecipe = useCallback(() => {
     //dialog.setData(undefined); // Clear dialog data for new recipe
-    dialog.open('new');
-  }, [dialog]); // TODO: receive url in dialog and remove it from query params
+    router.push('new');
+  }, [router]);
 
   const { data: filteredItems, ...filterOptions } = useFilter(recipes, {
     initialSortField: 'score',
@@ -55,11 +52,11 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
     filterOptions.setSortDirection(event.target.value.split('-')[1]);
   };
 
-  const fabStyle: React.CSSProperties = {
-    position: 'fixed',
-    bottom: 16,
-    right: 16,
-  };
+  // const fabStyle: React.CSSProperties = {
+  //   position: 'fixed',
+  //   bottom: 16,
+  //   right: 16,
+  // };
 
   const sortOptions = [
     { value: 'name-asc', label: 'Name (Ascending)' },
@@ -70,10 +67,10 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
 
   return (
     <>
-      <RecipeEditDialog
+      {/* <RecipeEditDialog
         open={dialog.isOpen}
         onClose={() => dialog.close()}
-      />
+      /> */}
 
       <Stack
         spacing={2}
@@ -162,14 +159,19 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
           handleRecipeClick={handleRecipeClick}
         />
       )}
-      <Fab
+      <FloatingButton
+        handleAdd={handleAddRecipe}
+        // icon={<AddIcon />}
+        // label="Add Recipe"
+      />
+      {/* <Fab
         color="primary"
         aria-label="add"
         style={fabStyle}
         onClick={handleAddRecipe}
       >
         <AddIcon />
-      </Fab>
+      </Fab> */}
     </>
   );
 }

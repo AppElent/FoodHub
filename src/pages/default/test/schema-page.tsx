@@ -5,6 +5,7 @@ import DefaultPage from '../DefaultPage';
 const SchemaPage = () => {
   const schema = createDummySchema();
   const mockdata = schema.generateMockData();
+  console.log(schema.getTemplate());
   return (
     <DefaultPage>
       <JsonEditor data={mockdata} />

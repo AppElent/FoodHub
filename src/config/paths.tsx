@@ -30,6 +30,16 @@ const menuCategories: MenuCategory[] = [
     translationKey: 'foodhub:menu.recipes',
   },
   {
+    id: 'foodtracker',
+    label: 'Foodtracker',
+    translationKey: 'foodhub:menu.foodtracker',
+  },
+  {
+    id: 'favorites',
+    label: 'Favorites',
+    translationKey: 'foodhub:menu.favorites',
+  },
+  {
     id: 'settings',
     label: 'Settings',
     translationKey: 'common:menu.settings',

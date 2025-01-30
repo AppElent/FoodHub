@@ -38,10 +38,15 @@ const AutocompleteChipList = ({
   // Merge suggestions with default suggestions and remove the current values
   const mergedSuggestions = useMemo(
     () =>
-      Array.from(new Set([...(fieldConfig?.custom?.suggestions || []), ...(suggestions || [])]))
+      Array.from(
+        new Set([
+          ...(fieldConfig?.custom?.autocompleteChipList?.suggestions || []),
+          ...(suggestions || []),
+        ])
+      )
         .filter((suggestion) => !field.value.includes(suggestion))
         .sort(Intl.Collator().compare),
-    [field.value, fieldConfig?.custom?.suggestions, suggestions]
+    [field.value, fieldConfig?.custom?.autocompleteChipList?.suggestions, suggestions]
   );
 
   return (

@@ -4,14 +4,6 @@ import _ from 'lodash';
 import * as Yup from 'yup';
 import { createMockDataGenerator } from './mock-data-generator';
 
-// export interface Schema {
-//   [key: string]: {
-//     required?: boolean;
-//     type?: string;
-//     minLength?: number;
-//   };
-// }
-
 type YupSchema<T extends Yup.AnyObject> = Yup.ObjectSchema<T>;
 
 interface ValidationResult<T> {
@@ -22,12 +14,16 @@ interface ValidationResult<T> {
   data: T;
 }
 
+export interface DefaultSchemaProps {
+  customFieldDefinitions?: { [key: string]: Partial<FieldConfig> };
+}
+
 export interface DefaultSchemaReturn<T> {
   schema: Yup.ObjectSchema<any>;
-  getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> };
-  generateMockData: <T extends Yup.AnyObject>(yupSchema?: YupSchema<T>) => T;
-  getMockData: <T extends Yup.AnyObject>(count: number) => T[];
-  generateTestData: <T extends Yup.AnyObject>(schema: YupSchema<T>) => T;
+  // getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> };
+  generateMockData: (yupSchema?: YupSchema<any>) => T;
+  getMockData: (count: number) => T[];
+  // generateTestData: <T extends Yup.AnyObject>(schema: YupSchema<T>) => T;
   generateObjectName: () => string;
   generateName: () => string;
   generateId: () => string;
@@ -35,7 +31,7 @@ export interface DefaultSchemaReturn<T> {
   generateNanoId: (options?: number | { min: number; max: number }) => string;
   generateUuid: () => string;
   getTemplate(): T;
-  getTestData: (count?: number) => T | T[];
+  // getTestData: (count?: number) => T | T[];
   getFieldDefinitions: () => { [key: string]: FieldConfig };
   validate: (data: T) => Promise<ValidationResult<T>>;
   clean: (data: T) => T;
@@ -43,13 +39,12 @@ export interface DefaultSchemaReturn<T> {
   fromDatabase: (data: any) => T;
 }
 
-export const createDefaultSchema = <T extends Yup.AnyObject>(
+export const createDefaultSchema = <T>(
   yupSchema: Yup.ObjectSchema<any>,
-  customFieldDefinitions?: { [key: string]: Partial<FieldConfig> }
+  options: DefaultSchemaProps = {}
 ): DefaultSchemaReturn<T> => {
   const schema = yupSchema;
   const mockDataGenerator = createMockDataGenerator<T>(yupSchema);
-  //const getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> } = () => ({});
 
   const removeUndefined = (obj: any) => {
     return Object.keys(obj).reduce((acc: any, key) => {
@@ -60,61 +55,11 @@ export const createDefaultSchema = <T extends Yup.AnyObject>(
     }, {});
   };
 
-  const generateTestData = <T extends Yup.AnyObject>(schema: YupSchema<T>): T => {
-    const shape = schema.fields;
-    const data: Partial<T> = {};
-
-    Object.keys(shape).forEach((key) => {
-      const field = shape[key];
-
-      if (field instanceof Yup.StringSchema) {
-        const minLength = (field.spec as any).min ?? 5;
-        const maxLength = (field.spec as any).max ?? 20;
-        data[key as keyof T] = faker.lorem.words(
-          faker.number.int({ min: minLength, max: maxLength })
-        ) as any;
-      } else if (field instanceof Yup.NumberSchema) {
-        const min = (field.spec as any).min ?? 0;
-        const max = (field.spec as any).max ?? 100;
-        data[key as keyof T] = faker.number.int({ min, max }) as any;
-      } else if (field instanceof Yup.BooleanSchema) {
-        data[key as keyof T] = faker.datatype.boolean() as any;
-      } else if (field instanceof Yup.DateSchema) {
-        const minDate = (field.spec as any).min
-          ? new Date((field.spec as any).min)
-          : faker.date.past();
-        const maxDate = (field.spec as any).max
-          ? new Date((field.spec as any).max)
-          : faker.date.future();
-        data[key as keyof T] = faker.date.between({ from: minDate, to: maxDate }) as any;
-      } else if (field instanceof Yup.ArraySchema) {
-        const itemType = (field as Yup.ArraySchema<any, any, any, any>).innerType;
-        const minItems = (field.spec as any).min ?? 1;
-        const maxItems = (field.spec as any).max ?? 5;
-        const length = faker.number.int({ min: minItems, max: maxItems });
-
-        if (itemType instanceof Yup.StringSchema) {
-          data[key as keyof T] = Array.from({ length }, () => faker.lorem.word()) as any;
-        } else if (itemType instanceof Yup.NumberSchema) {
-          data[key as keyof T] = Array.from({ length }, () => faker.number.int()) as any;
-        }
-      } else if (field instanceof Yup.ObjectSchema) {
-        data[key as keyof T] = generateTestData(field) as any;
-      }
-    });
-
-    return data as T;
-  };
-
   return {
     schema,
     generateMockData: mockDataGenerator.generateMockData,
-    getMockData: <T extends Yup.AnyObject>(count: number) =>
-      mockDataGenerator.getMockData(count) as unknown as T[],
-    getCustomFieldDefinitions: () => {
-      return {};
-    },
-    generateTestData: () => generateTestData(schema),
+    getMockData: (count: number) => mockDataGenerator.getMockData(count) as unknown as T[],
+    // generateTestData: () => generateTestData(schema),
     generateObjectName: () => {
       return faker.word.noun();
     },
@@ -144,18 +89,6 @@ export const createDefaultSchema = <T extends Yup.AnyObject>(
         }
         return acc;
       }, {});
-    },
-    getTestData: (count?: number): T | T[] => {
-      // If number is 1, return a single object
-      if (!count || count === 1) {
-        return generateTestData(schema) as T;
-      } else if (count > 1) {
-        return Array.from({ length: count }, () => {
-          return generateTestData(schema) as T;
-        });
-      } else {
-        throw new Error('Count must be greater than 0');
-      }
     },
     getFieldDefinitions: (): { [key: string]: FieldConfig } => {
       // Go through all fields and add them to the return schema.
@@ -195,7 +128,9 @@ export const createDefaultSchema = <T extends Yup.AnyObject>(
       };
       extractFields(schema);
       //const customFieldDefinitions = getCustomFieldDefinitions?.() ?? {};
-      const returnFieldDefinitions = _.merge({}, result, customFieldDefinitions);
+      const returnFieldDefinitions = options?.customFieldDefinitions
+        ? _.merge({}, result, options?.customFieldDefinitions)
+        : result;
       return returnFieldDefinitions; //defaultFieldDefinitions;
       // const merged = merge({}, result, fieldConfig);
       // return merged;

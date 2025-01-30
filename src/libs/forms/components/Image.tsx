@@ -1,21 +1,48 @@
 import { FieldConfig } from '@/libs/forms';
 import useFormField from '@/libs/forms/use-form-field';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import CropIcon from '@mui/icons-material/Crop';
-import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Button,
   Card,
   CardActions,
+  CardHeader,
   CardMedia,
   IconButton,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import _ from 'lodash';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import ImageCropper from '../../../components/default/images/image-cropper';
+
+type Action = {
+  icon: JSX.Element;
+  label: string;
+  action?: (url: string) => void;
+};
+
+type SpecificActions = {
+  crop?: {
+    icon?: JSX.Element;
+    label?: string;
+    action?: (url: string) => void;
+  };
+  delete: {
+    icon?: JSX.Element;
+    label?: string;
+    action?: (url: string) => void;
+  };
+  favorite: {
+    icon?: JSX.Element;
+    isFavorite?: boolean;
+    label?: string;
+    action: (url: string) => void;
+  };
+}; //TODO: fix
+
+type ActionObject = SpecificActions & {
+  [key: string]: Action;
+};
 
 interface ImageProps {
   name?: string;
@@ -26,9 +53,25 @@ interface ImageProps {
   getFavorite?: (url: string) => boolean;
   setFavorite?: (url: string) => void;
   cropImage?: (url: string) => Promise<string>;
+  actions?: {
+    id: string;
+    icon: JSX.Element;
+    label: string;
+    action: (url: string) => void;
+  }[];
+  actionObject?: ActionObject;
+  showUploadButton?: boolean;
 }
 
-const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: ImageProps) => {
+const Image = ({
+  name,
+  field: fieldConfig,
+  actions = [],
+  showUploadButton = true,
+  deleteImage,
+  cropImage,
+  ...props
+}: ImageProps) => {
   if (!name && !fieldConfig) {
     throw new Error('Either name or field must be provided');
   }
@@ -51,16 +94,16 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (deleteImage) {
-      deleteImage(id);
-    }
-    helpers.setValue('');
-  };
+  // const handleDelete = (id: string) => {
+  //   if (deleteImage) {
+  //     deleteImage(id);
+  //   }
+  //   helpers.setValue('');
+  // };
 
   return (
     <Box>
-      <Typography
+      {/* <Typography
         variant="h6"
         gutterBottom
       >
@@ -68,7 +111,7 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
       </Typography>
 
       {/* Upload Button */}
-      <Button
+      {/* <Button
         variant="contained"
         component="label"
         startIcon={<AddPhotoAlternateIcon />}
@@ -81,7 +124,7 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
           hidden
           onChange={handleUpload}
         />
-      </Button>
+      </Button> */}
 
       {/* Display Images */}
       <Box
@@ -93,17 +136,70 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
       >
         <Card
           key={image}
-          sx={{ width: 300 }}
+          sx={{ width: 300, position: 'relative' }}
         >
+          <CardHeader
+            title="Image"
+            titleTypographyProps={{ variant: 'h6' }}
+          />
           <CardMedia
             component="img"
             height="200"
             image={image ? image : '/app/Image_not_available.png'}
             alt="Uploaded Image"
           />
-          <CardActions style={{ justifyContent: 'flex-end' }}>
-            {/* Crop image */}
-            {!!cropImage && (
+          {showUploadButton && (
+            <Button
+              variant="contained"
+              component="label"
+              startIcon={<AddPhotoAlternateIcon />}
+              {...newProps?.muiButtonProps}
+              sx={{
+                position: 'absolute',
+                top: 70,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                color: 'white',
+              }}
+            >
+              Upload Image
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleUpload}
+              />
+            </Button>
+          )}
+          {actions?.length > 0 && (
+            <CardActions sx={{ justifyContent: 'flex-end' }}>
+              {actions.map((action) => (
+                <Tooltip
+                  key={action.id}
+                  title={action.label}
+                  placement="top"
+                >
+                  <IconButton
+                    onClick={() => action.action(image)}
+                    // disabled={image.isDefault}
+                  >
+                    {action.icon}
+                  </IconButton>
+                </Tooltip>
+                // <Button
+                //   key={action.id}
+                //   onClick={() => action.action(image)}
+                // >
+                //   {action.icon}
+                //   {action.label}
+                // </Button>
+              ))}
+            </CardActions>
+          )}
+          {/* <CardActions style={{ justifyContent: 'flex-end' }}> */}
+          {/* Crop image */}
+          {/* {!!cropImage && (
               <Tooltip
                 title="Crop Image"
                 placement="top"
@@ -116,9 +212,9 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
                   <CropIcon />
                 </IconButton>
               </Tooltip>
-            )}
+            )} */}
 
-            {/* Set Favorite
+          {/* Set Favorite
             {getFavorite && (
               <Tooltip
                 title="Set as Favorite"
@@ -138,8 +234,8 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
               </Tooltip>
             )} */}
 
-            {/* Delete */}
-            {deleteImage && (
+          {/* Delete */}
+          {/* {deleteImage && (
               <Tooltip
                 title="Delete"
                 placement="top"
@@ -152,8 +248,8 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
                   <DeleteIcon />
                 </IconButton>
               </Tooltip>
-            )}
-          </CardActions>
+            )} */}
+          {/* </CardActions> */}
         </Card>
       </Box>
       {cropperUrl && (

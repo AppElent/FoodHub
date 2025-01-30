@@ -15,7 +15,7 @@ const Select = ({ name, field: fieldConfig, options: menuOptions }: CustomSelect
   }
   const fieldName = name || fieldConfig?.name;
   const data = useFormField(fieldName as string, fieldConfig);
-  const { options, field, meta } = data;
+  const { field, meta } = data;
 
   const selectOptions = menuOptions || fieldConfig?.options || [];
 
@@ -35,7 +35,7 @@ const Select = ({ name, field: fieldConfig, options: menuOptions }: CustomSelect
         >
           {selectOptions.map((option: any) => (
             <MenuItem
-              key={options.key || option.value}
+              key={option.key || option.value}
               value={option.key || option.value}
             >
               {option.value}

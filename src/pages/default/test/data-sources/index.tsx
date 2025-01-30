@@ -97,7 +97,7 @@ const datasources = {
       target: 'dummy',
       subscribe: true,
       YupValidationSchema: dummyYupSchema,
-      data: createDummySchema().getTestData(5),
+      data: createDummySchema().getMockData(5),
     }),
   },
   // MockDataSource: {
@@ -118,8 +118,8 @@ const DataSource = (props: any) => {
   const datasource = useData<Dummy>(datasourceName, { datasource: newDataSource });
 
   const handleAdd = async () => {
-    const newItem = createDummySchema().generateTestData(); //getDummyTestData(1) as Dummy;
-    await datasource.actions.add(newItem);
+    const newItem = createDummySchema().generateMockData(); //getDummyTestData(1) as Dummy;
+    await datasource.actions.add(newItem as Dummy); //TODO: fix this
   };
 
   const handleGetAll = async () => {

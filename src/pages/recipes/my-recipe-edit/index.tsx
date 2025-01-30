@@ -8,6 +8,7 @@ const MyRecipeEdit = () => {
   const { data: recipes } = useData<Recipe>('recipes');
   const recipe = useParamItem({
     items: recipes || [],
+    id: 'recipeId',
   }) as Recipe;
 
   const options = {

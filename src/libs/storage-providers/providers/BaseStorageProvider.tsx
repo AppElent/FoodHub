@@ -34,11 +34,11 @@ export default class BaseStorageProvider {
     serverFileWrongSize: 'File on the server is not the same size as the file on the client.',
   };
 
-  async uploadBrowserBlob(folder: string, blobUrl: string): Promise<string> {
+  async uploadBrowserBlob(folder: string, blobUrl: string, filename?: string): Promise<string> {
     const blob = await fetch(blobUrl).then((r) => r.blob());
-    const filename = blobUrl.split('/').pop();
-    const file = new File([blob], filename || 'file', { type: blob.type });
-    const path = `${folder}/${filename}`;
+    const defFilename = filename || blobUrl.split('/').pop();
+    const file = new File([blob], defFilename || 'file', { type: blob.type });
+    const path = `${folder}/${defFilename}`;
     const imageUrl = await this.uploadFile(file, path);
 
     return imageUrl;

@@ -93,5 +93,9 @@
     "importProgress": "Importeren: {{processed}}/{{total}}"
   },
   "loading": "Laden",
-  "buttons": {}
+  "buttons": {},
+  "menu": {
+    "settings": "Instellingen",
+    "profile": "Profiel"
+  }
 }

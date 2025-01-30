@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, TextField } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -59,6 +59,8 @@ const PasswordCard = ({ setPassword }: PasswordCardProps) => {
           {...formik.getFieldProps('confirmPassword')}
           margin="normal"
         />
+      </CardContent>
+      <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button
           variant="contained"
           color="primary"
@@ -68,7 +70,7 @@ const PasswordCard = ({ setPassword }: PasswordCardProps) => {
         >
           Change Password
         </Button>
-      </CardContent>
+      </CardActions>
     </Card>
   );
 };

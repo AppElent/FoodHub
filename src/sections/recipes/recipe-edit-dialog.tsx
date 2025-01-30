@@ -218,7 +218,6 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
           <CustomForm
             formik={formik}
             options={{
-              editMode: true,
               debounce: 300,
               muiTextFieldProps: {
                 fullWidth: true,

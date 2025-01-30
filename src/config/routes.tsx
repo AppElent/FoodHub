@@ -11,6 +11,8 @@ import FiltersPage from '@/pages/default/test/filters-page';
 import Forms from '@/pages/default/test/forms';
 import SchemaPage from '@/pages/default/test/schema-page';
 import Translations from '@/pages/default/test/translations';
+import Wine from '@/pages/favorites/wine';
+import FoodtrackerHome from '@/pages/foodtracker/home';
 import HomePage from '@/pages/recipes/home';
 import MyRecipeDetailsPage from '@/pages/recipes/my-recipe-details';
 import MyRecipeEdit from '@/pages/recipes/my-recipe-edit';
@@ -19,6 +21,7 @@ import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
 import RecipeDetailsPage from '@/pages/recipes/recipe-details';
 import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import { CustomRouteObject, routes as routesImport } from './routing';
+import Cheese from '@/pages/favorites/cheese';
 
 const routeElements: { [key: string]: JSX.Element } = {
   home: (
@@ -37,6 +40,12 @@ const routeElements: { [key: string]: JSX.Element } = {
   myRecipeDetailsIndex: <MyRecipeDetailsPage />,
   myRecipeNew: <MyRecipeNew />,
   myRecipeEdit: <MyRecipeEdit />,
+  // Foodtracker pages
+  foodtrackerIndex: <FoodtrackerHome />,
+  // Favorites pages
+  favoritesIndex: <div>Favorites</div>,
+  wine: <Wine />,
+  cheese: <Cheese />,
   // Test pages
   testDataSources: <DataSources />,
   testFileUploads: <FileUploads />,

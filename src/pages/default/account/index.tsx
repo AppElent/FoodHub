@@ -1,6 +1,6 @@
 import { AppConfig, setLogLevel } from '@/config';
 import useAuth from '@/libs/auth/use-auth';
-import { Button, Card, CardContent, CardHeader, Grid } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPage from '../DefaultPage';
 import DebugCard from './components/debug-card';
 import PasswordCard from './components/password-card';
@@ -30,10 +30,12 @@ const Account = () => {
           xs={12}
           md={6}
         >
-          <ProfileCard
-            profile={auth?.user}
-            setProfile={async (values) => await auth.updateProfile?.(values)}
-          />
+          {auth?.user && (
+            <ProfileCard
+              profile={auth.user}
+              setProfile={async (values) => await auth.updateProfile?.(values)}
+            />
+          )}
         </Grid>
         <Grid
           item
@@ -65,17 +67,17 @@ const Account = () => {
         >
           <Card>
             <CardHeader title="User" />
-            <CardContent>
-              {' '}
-              Current user: {auth.user?.email}
+            <CardContent> Current user: {auth.user?.email}</CardContent>
+            <CardActions sx={{ justifyContent: 'flex-end' }}>
               <Button
+                variant="contained"
                 onClick={() => {
                   auth.signOut();
                 }}
               >
                 Logout
               </Button>
-            </CardContent>
+            </CardActions>
           </Card>
         </Grid>
       </Grid>

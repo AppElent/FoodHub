@@ -2,16 +2,17 @@ import JsonEditor from '@/components/default/json-editor';
 import GridLayout from '@/components/default/ui/grid-layout';
 import LoadingButton from '@/components/default/ui/loading-button';
 import { getLogLevel } from '@/config';
+import useKeyboardShortcut from '@/hooks/use-keyboard-shortcut';
 import usePathRouter from '@/hooks/use-path-router';
 import useQueryParamAction from '@/hooks/use-query-param-action';
 import useAuth from '@/libs/auth/use-auth';
-import { useData } from '@/libs/data-sources';
 import { CustomForm } from '@/libs/forms';
 import AutocompleteChipList from '@/libs/forms/components/AutocompleteChipList';
 import CancelButton from '@/libs/forms/components/CancelButton';
 import Errors from '@/libs/forms/components/Errors';
 import Image from '@/libs/forms/components/Image';
 import Images from '@/libs/forms/components/Images';
+import JsonTextField from '@/libs/forms/components/JsonTextField';
 import List from '@/libs/forms/components/List';
 import Rating from '@/libs/forms/components/Rating';
 import SubmitButton from '@/libs/forms/components/SubmitButton';
@@ -19,8 +20,12 @@ import TextField from '@/libs/forms/components/TextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { createRecipeSchema, Recipe, recipeYupSchema } from '@/schemas/recipes/recipe';
+import useDataHelper from '@/schemas/use-data-helper';
+import CropIcon from '@mui/icons-material/Crop';
+import DeleteIcon from '@mui/icons-material/Delete';
+import StarIcon from '@mui/icons-material/Star';
 import { Box, Button, CardActions, Grid, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface RecipeEditDialogProps {
@@ -33,16 +38,52 @@ interface externalDataActionInterface {
   error: string | null;
 }
 
+const imageActions = [
+  {
+    id: 'crop',
+    label: 'Crop image',
+    icon: <CropIcon color="primary" />,
+    action: (url: string) => {
+      console.log(url);
+    },
+  },
+  {
+    id: 'favorite',
+    label: 'Set as favorite',
+    icon: <StarIcon style={{ color: '#faaf00' }} />,
+    action: (url: string) => {
+      console.log(url);
+    },
+  },
+  {
+    id: 'delete',
+    label: 'Delete image',
+    icon: <DeleteIcon sx={{ color: 'red' }} />,
+    action: (url: string) => {
+      console.log(url);
+    },
+  },
+];
+
 const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
   //   const formik = useFormikContext<Recipe>();
   const auth = useAuth({ redirectUnauthenticated: true });
   // Translation
   const { t } = useTranslation();
+  // Recipe data
+  const {
+    data: recipes,
+    setItem: setRecipe,
+    deleteItem: deleteRecipe,
+  } = useDataHelper<Recipe>('recipes', { label: t('foodhub:defaults.recipe') });
+  // const { set: setRecipe, delete: deleteRecipe } = recipeActions;
   // Loading external data state
   const [externalDataAction, setExternalDataAction] = useState<externalDataActionInterface>({
     loading: false,
     error: null,
   });
+  // Save using CTRL-S
+  useKeyboardShortcut('s', () => formik.handleSubmit());
 
   // If formik.values.owner is set, it should be the same as currentuser
   useEffect(() => {
@@ -56,8 +97,23 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     }
   });
 
-  const { data: recipes, actions: recipeActions } = useData<Recipe>('recipes');
-  const { set: setRecipe } = recipeActions;
+  const fetchExternalData = useCallback(async (url: string) => {
+    if (url) {
+      setExternalDataAction({ loading: true, error: null });
+      try {
+        const recipeData = await createRecipeSchema().fetchExternalData(url);
+        formik.setValues({
+          ...formik.values,
+          ...recipeData,
+        });
+      } catch (e: any) {
+        console.error(e);
+        setExternalDataAction({ loading: false, error: e.message });
+      } finally {
+        setExternalDataAction({ loading: false, error: externalDataAction.error });
+      }
+    }
+  }, []);
 
   const initialValues = useMemo(() => {
     const recipeValues = recipe || createRecipeSchema().getTemplate();
@@ -74,8 +130,8 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     enableReinitialize: true,
     onSubmit: async (values: Recipe) => {
       // Save data
-      const savedRecipe = await setRecipe(values, values.id);
-      const recipeId = savedRecipe.id;
+      await setRecipe(values, values.id);
+      const recipeId = values.id;
 
       const filesToUpload = formik.values.images.filter((url: string) => url.startsWith('blob:'));
       if (filesToUpload.length > 0) {
@@ -114,7 +170,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
       }
 
       // Redirect to recipe page
-      //router.push('recipeDetails', { id: recipeId });
+      router.push('myRecipeDetails', { recipeId: recipeId });
       //onClose();
     },
   });
@@ -122,21 +178,8 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
   // Receive url query param and fetch recipe data
   useQueryParamAction('url', (url) => {
     const fetchDataAndUpdateFormik = async () => {
-      try {
-        setExternalDataAction({ loading: true, error: null });
-        await formik.setFieldValue('url', url);
-        const recipeData = await createRecipeSchema().fetchExternalData(url);
-        console.log('RECIPEDATA', recipeData);
-        formik.setValues({
-          ...formik.values,
-          ...recipeData,
-        });
-      } catch (e: any) {
-        console.error(e);
-        setExternalDataAction({ loading: false, error: e.message });
-      } finally {
-        setExternalDataAction({ loading: false, error: externalDataAction.error });
-      }
+      await formik.setFieldValue('url', url);
+      await fetchExternalData(url);
       //await fetchData(`https://api-python.appelent.site/recipes/scrape?url=${url}`);
     };
     if (url && formik.values.url !== url && !externalDataAction.loading) {
@@ -197,23 +240,23 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
 
   //   const { set: setRecipe, delete: deleteRecipe } = recipeActions;
 
-  //   // Delete all images that are uploaded to firebasestorage
-  //   const deleteRecipeAndImages = async (recipeId: string) => {
-  //     const storageClass = new FirebaseStorageProvider();
+  // Delete all images that are uploaded to firebasestorage
+  const deleteRecipeAndImages = async (recipeId: string) => {
+    const storageClass = new FirebaseStorageProvider();
 
-  //     // Check images and image url
-  //     const images = recipe?.images || [];
-  //     if (recipe?.image) {
-  //       images.push(recipe.image);
-  //     }
-  //     for (const url of images) {
-  //       // Check if image url is manually uploaded to firebasestorage
-  //       if (url?.startsWith('https://firebasestorage.googleapis.com')) {
-  //         await storageClass.deleteFile(url);
-  //       }
-  //     }
-  //     await deleteRecipe(recipeId);
-  //   };
+    // Check images and image url
+    const images = recipe?.images || [];
+    if (recipe?.image) {
+      images.push(recipe.image);
+    }
+    for (const url of images) {
+      // Check if image url is manually uploaded to firebasestorage
+      if (url?.startsWith('https://firebasestorage.googleapis.com')) {
+        await storageClass.deleteFile(url);
+      }
+    }
+    await deleteRecipe(recipeId);
+  };
 
   //   const initialValues = useMemo(() => {
   //     return {
@@ -251,7 +294,6 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
         <CustomForm
           formik={formik}
           options={{
-            editMode: true,
             debounce: 300,
             muiTextFieldProps: {
               fullWidth: true,
@@ -266,6 +308,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
           <Image
             name="image"
             field={fields.image}
+            actions={imageActions}
           />
           <TextField field={fields.name} />
           <Rating
@@ -299,13 +342,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
                     variant="contained"
                     disabled={!!formik.errors.url || !formik.values.url}
                     isLoading={externalDataAction.loading}
-                    onClick={async () => {
-                      const data = await createRecipeSchema().fetchExternalData(formik.values.url);
-                      formik.setValues({
-                        ...formik.values,
-                        ...data,
-                      });
-                    }}
+                    onClick={async () => fetchExternalData(formik.values.url)}
                   >
                     {t('foodhub:pages.edit-recipe.get-recipe-information')}
                   </LoadingButton>
@@ -321,14 +358,12 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               {externalDataAction.error}
             </Typography>
           )}
-
           <AutocompleteChipList
             field={fields.cuisine}
             suggestions={cuisineSuggestions}
           />
           <List field={fields.ingredients} />
           <List field={fields.instructions} />
-
           <TextField field={fields.comments} />
           <GridLayout
             itemProps={{ xs: 12, md: 4, lg: 4 }}
@@ -345,6 +380,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
           />
           <TextField field={fields.yieldsText} />
           <TextField field={fields['nutrients.calories']} />
+
           <Images
             field={fields.images}
             uploadImage={async (file) => {
@@ -370,20 +406,24 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               return '';
             }}
           />
-
           <Errors fields={fields} />
+
           {getLogLevel() === 'debug' && (
-            <JsonEditor
-              data={{ recipe, formik: formik?.values }}
-              options={{ collapsed: true }}
-            /> //TODO: Json field and json editor form components
+            <Box mt={2}>
+              {/* //TODO: Json field and json editor form components */}
+              <JsonTextField />
+              <JsonEditor
+                data={{ recipe, formik: formik?.values }}
+                options={{ collapsed: true }}
+              />
+            </Box>
           )}
           <CardActions sx={{ justifyContent: 'flex-end' }}>
             {!!recipe && (
               <Button
                 onClick={() => {
-                  //deleteRecipeAndImages(recipe.id);
-                  formik.resetForm();
+                  deleteRecipeAndImages(recipe.id);
+                  router.push('myRecipes');
                 }}
                 variant="outlined"
                 color="error"

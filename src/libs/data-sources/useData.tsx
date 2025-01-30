@@ -2,12 +2,12 @@ import { useContext, useEffect, useMemo } from 'react';
 import { DataSource, FilterObject, WithOptionalId } from '.';
 import { DataContext } from './DataProvider';
 
-interface UseDataPropsOptions<T> {
+export interface UseDataPropsOptions<T> {
   datasource?: any;
   addDatasourceWhenNotAvailable?: boolean;
   filter?: FilterObject<T>;
   find?: { field: keyof T; operator: '=='; value: any };
-  [key: string]: any;
+  // [key: string]: any;
 }
 
 // interface UseDataReturn<T> {

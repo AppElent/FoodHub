@@ -42,6 +42,11 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
+const testUser = {
+  email: 'test@test.com',
+  password: 'test123',
+};
+
 const SignInContainer = styled(Stack)(({ theme }) => ({
   padding: 20,
   minHeight: '80vhvh',
@@ -261,6 +266,18 @@ export default function SignIn(props) {
             >
               Login with demo account
             </Button>
+            {import.meta.env.DEV && (
+              <Button
+                type="submit"
+                fullWidth
+                variant="outlined"
+                // spread all props of buttons.facebook except text property
+                {...buttons.loginDemoUser}
+                onClick={() => formik.setValues(testUser)}
+              >
+                Login with test account
+              </Button>
+            )}
           </Box>
         </Card>
       </SignInContainer>

@@ -17,7 +17,7 @@ const columns = [
 ];
 
 const FiltersPage = () => {
-  const data = useMemo(() => createDummySchema().getTestData(20), []) as Dummy[];
+  const data = useMemo(() => createDummySchema().getMockData(20), []) as Dummy[];
 
   return (
     <DefaultPage>

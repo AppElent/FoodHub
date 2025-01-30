@@ -3,8 +3,14 @@ import * as Yup from 'yup';
 import { createDefaultSchema } from '.';
 
 export const dummyYupSchema = Yup.object().shape({
-  id: Yup.string().required('ID is required').min(3, 'Minimum 3 characters'),
-  name: Yup.string().required('Name is required').min(3, 'Minimum 3 characters'),
+  id: Yup.string()
+    .required('ID is required')
+    .min(3, 'Minimum 3 characters')
+    .default(() => faker.string.nanoid()),
+  name: Yup.string()
+    .required('Name is required')
+    .min(3, 'Minimum 3 characters')
+    .default(() => faker.word.verb() + ' ' + faker.word.noun()),
   string: Yup.string().optional(),
   number: Yup.number().optional(),
   date: Yup.date().optional(),
@@ -27,7 +33,7 @@ export const dummyYupSchema = Yup.object().shape({
   lowercase: Yup.string().lowercase().optional(),
   min: Yup.string().min(3).optional(),
   max: Yup.string().max(20).optional(),
-  oneOf: Yup.number().oneOf([1, 2, 3]).optional(),
+  oneOf: Yup.string().oneOf(['one', 'two', 'three']).optional(),
   minNumber: Yup.number().min(0).optional(),
   maxNumber: Yup.number().max(100).optional(),
   oneOfNumber: Yup.number().oneOf([1, 2, 3]).optional(),
@@ -48,31 +54,31 @@ export type Dummy = Yup.InferType<typeof dummyYupSchema>;
 
 export const createDummySchema = () => {
   const defaultSchema = createDefaultSchema<Dummy>(dummyYupSchema);
-  const generateTestData = () => {
-    return {
-      ...defaultSchema.generateTestData(dummyYupSchema),
-      name: faker.word.verb() + ' ' + faker.word.noun(),
-      id: defaultSchema.generateNanoId(),
-    };
-  };
+  // const generateTestData = () => {
+  //   return {
+  //     ...defaultSchema.generateTestData(dummyYupSchema),
+  //     name: faker.word.verb() + ' ' + faker.word.noun(),
+  //     id: defaultSchema.generateNanoId(),
+  //   };
+  // };
   return {
     ...defaultSchema,
-    getTemplate: () => {
-      return {
-        ...defaultSchema.getTemplate(),
-        name: faker.word.verb() + ' ' + faker.word.noun(),
-      };
-    },
-    generateTestData,
-    getTestData: (count: number): Dummy[] => {
-      if (count > 1) {
-        return Array.from({ length: count }, () => {
-          return generateTestData();
-        });
-      } else {
-        throw new Error('Count must be greater than 0');
-      }
-    },
+    // getTemplate: () => {
+    //   return {
+    //     ...defaultSchema.getTemplate(),
+    //     name: faker.word.verb() + ' ' + faker.word.noun(),
+    //   };
+    // },
+    // generateTestData,
+    // getTestData: (count: number): Dummy[] => {
+    //   if (count > 1) {
+    //     return Array.from({ length: count }, () => {
+    //       return generateTestData();
+    //     });
+    //   } else {
+    //     throw new Error('Count must be greater than 0');
+    //   }
+    // },
   };
 };
 

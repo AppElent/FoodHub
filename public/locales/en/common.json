@@ -156,7 +156,9 @@
     "submitError": "Error when submitting {{resource}} (status code: {{statusCode}})",
     "importProgress": "Importing: {{processed}}/{{total}}",
     "savedSuccess": "Saved Successfully",
-    "savedError": "Error saving"
+    "savedError": "Error saving",
+    "updatedSuccess": "{{resource}} updated successfully",
+    "updatedError": "Error updating {{resource}}"
   },
   "loading": "Loading",
   "posts": {
@@ -193,6 +195,7 @@
     "languageChanged": "Language changed"
   },
   "menu": {
-    "settings": "Settings"
+    "settings": "Settings",
+    "profile": "Profile"
   }
 }

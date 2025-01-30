@@ -1,11 +1,12 @@
 import NoImageAvailable from '@/components/default/images/no-image-available';
 import ImageList from '@/components/default/ui/image-list';
 import useIsMobile from '@/hooks/use-is-mobile';
-import useRouter from '@/hooks/use-router';
+import usePathRouter from '@/hooks/use-path-router';
 import useAuth from '@/libs/auth/use-auth';
 import { Recipe } from '@/schemas/recipes/recipe';
 import {
   AccessTime as AccessTimeIcon,
+  Delete as DeleteIcon,
   Edit as EditIcon,
   Restaurant as RestaurantIcon,
 } from '@mui/icons-material';
@@ -26,9 +27,14 @@ import { useTranslation } from 'react-i18next';
 
 // TODO: add image viewer and set image as default
 
-const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
+interface RecipeDetailsProps {
+  recipe?: Recipe;
+  deleteRecipe?: () => void;
+}
+
+const RecipeDetails = ({ recipe, deleteRecipe }: RecipeDetailsProps) => {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = usePathRouter();
   // Get user
   const { user } = useAuth();
 
@@ -76,15 +82,25 @@ const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
             {recipe.name}
           </Typography>
           {user?.id === recipe.owner && (
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<EditIcon />}
-              //onClick={handleEdit}
-              onClick={() => router.push('edit')}
+            <Stack
+              direction="row"
+              spacing={2}
             >
-              {t('common:actions.edit')}
-            </Button>
+              {deleteRecipe && (
+                <Button color="error">
+                  <DeleteIcon onClick={deleteRecipe} />
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<EditIcon />}
+                //onClick={handleEdit}
+                onClick={() => router.push('myRecipeEdit', { recipeId: recipe.id })}
+              >
+                {t('common:actions.edit')}
+              </Button>
+            </Stack>
           )}
         </Stack>
         {recipe.description && (

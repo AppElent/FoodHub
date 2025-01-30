@@ -64,7 +64,9 @@
   "menu": {
     "recipes": "Recepten",
     "allrecipes": "Alle Recepten",
-    "myRecipes": "Mijn recepten"
+    "myRecipes": "Mijn recepten",
+    "foodtracker": "Voedseltracker",
+    "favorites": "Favorieten"
   },
   "defaults": {
     "recipe": "Recept"

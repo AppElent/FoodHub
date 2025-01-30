@@ -10,6 +10,7 @@ export type CustomRouteObject = RouteObject & {
   Icon: JSX.Element;
   translationKey?: string;
   category?: string;
+  loginRequired?: boolean;
   children?: CustomRouteObject[] | any;
 };
 
@@ -61,7 +62,7 @@ export const routes: CustomRouteObject[] = [
                 id: 'myRecipeDetails',
                 label: 'Recipe details',
                 Icon: <FlatwareIcon fontSize="inherit" />,
-                path: ':id',
+                path: ':recipeId',
                 element: <Outlet />,
                 children: [
                   {
@@ -82,7 +83,50 @@ export const routes: CustomRouteObject[] = [
             id: 'recipeDetails',
             label: 'Recipe details',
             Icon: <FlatwareIcon fontSize="inherit" />,
-            path: ':id',
+            path: ':recipeId',
+          },
+        ],
+      },
+      {
+        id: 'foodtracker',
+        label: 'Foodtracker',
+        path: 'foodtracker',
+        translationKey: 'foodhub:menu.foodtracker',
+        Icon: <FlatwareIcon fontSize="inherit" />,
+        category: 'foodtracker',
+        element: <Outlet />,
+        children: [
+          {
+            id: 'foodtrackerIndex',
+            index: true,
+          },
+        ],
+      },
+      {
+        id: 'favorites',
+        label: 'Favorites',
+        path: 'favorites',
+        translationKey: 'foodhub:menu.favorites',
+        Icon: <FlatwareIcon fontSize="inherit" />,
+        //category: 'favorites',
+        children: [
+          {
+            id: 'favoritesIndex',
+            index: true,
+          },
+          {
+            id: 'wine',
+            label: 'Wine',
+            Icon: <FlatwareIcon fontSize="inherit" />,
+            path: 'wine',
+            category: 'favorites',
+          },
+          {
+            id: 'cheese',
+            label: 'Cheese',
+            Icon: <FlatwareIcon fontSize="inherit" />,
+            path: 'cheese',
+            category: 'favorites',
           },
         ],
       },

@@ -1,4 +1,4 @@
-import { Seo, setPageTitleSuffix } from '@/components/default/seo';
+import { setPageTitleSuffix } from '@/components/default/seo';
 import { SplashScreen } from '@/components/default/splash-screen';
 import config from '@/config';
 import useHttpsRedirect from '@/hooks/use-https-redirect';
@@ -64,7 +64,7 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
                     <DataProvider dataSources={dataSources || {}}>
                       <QueryParamProvider adapter={ReactRouter6Adapter}>
                         <ConfirmProvider>
-                          <Seo />
+                          {/* <Seo /> */}
                           <ToastContainer
                             position="top-right"
                             autoClose={2500}

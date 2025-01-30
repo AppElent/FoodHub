@@ -1,10 +1,34 @@
+import { faker } from '@faker-js/faker';
+import InputAdornment from '@mui/material/InputAdornment';
 import * as Yup from 'yup';
 import { createDefaultSchema } from '..';
 import { ExternalRecipe } from './external-recipe';
 
-// TODO: Fix optional fields with default value... and then undefined values in firestore data
+const recipeYupTimeSchema = Yup.object().shape({
+  prep: Yup.number().optional().default(0).label('Preparation Time'),
+  cooking: Yup.number().optional().default(0).label('Cooking Time'),
+  total: Yup.number().optional().default(0).label('Total Time'),
+});
+
+const recipeYupYieldsSchema = Yup.object().shape({
+  quantity: Yup.number().optional().default(2).label('Quantity'),
+  unit: Yup.string().optional().default('servings').oneOf(['servings', 'pieces']).label('Unit'),
+});
+
+const recipeYupNutrientsSchema = Yup.object().shape({
+  calories: Yup.string().optional().default('0').label('Calories'),
+  fat: Yup.string().optional().default('0').label('Fat'),
+  sugar: Yup.string().optional().default('0').label('Sugar'),
+  fiber: Yup.string().optional().default('0').label('Fiber'),
+  protein: Yup.string().optional().default('0').label('Protein'),
+  carbs: Yup.string().optional().default('0').label('Carbohydrates'),
+});
+
 export const recipeYupSchema = Yup.object().shape({
-  id: Yup.string().optional().default('').label('ID'),
+  id: Yup.string()
+    .optional()
+    .default(() => faker.string.nanoid())
+    .label('ID'),
   owner: Yup.string().required('Owner is required').label('Owner'),
   name: Yup.string()
     .required()
@@ -17,32 +41,13 @@ export const recipeYupSchema = Yup.object().shape({
     .default('')
     .label('Description')
     .meta({ default: '', translationKey: 'foodhub:schemas.recipe.description' }),
-  time: Yup.object()
-    .shape({
-      prep: Yup.number().optional().default(0).label('Preparation Time'),
-      cooking: Yup.number().optional().default(0).label('Cooking Time'),
-      total: Yup.number().optional().default(0).label('Total Time'),
-    })
+  time: recipeYupTimeSchema.default(() => recipeYupTimeSchema.getDefault()).label('Time'),
+  yields: recipeYupYieldsSchema.default(() => recipeYupYieldsSchema.getDefault()).label('Yields'),
+  yieldsText: Yup.string().optional().default('').optional().label('Yields'),
+  nutrients: recipeYupNutrientsSchema
     .optional()
-    .label('Time'),
-  yields: Yup.object()
-    .shape({
-      quantity: Yup.number().optional().default(0).label('Quantity'),
-      unit: Yup.string().optional().default('servings').label('Unit'),
-    })
-    .label('Yields'),
-  yieldsText: Yup.string().optional().default('').label('Yields'),
-  nutrients: Yup.object()
-    .shape({
-      calories: Yup.string().optional().default('0').label('Calories'),
-      fat: Yup.string().optional().default('0').label('Fat'),
-      sugar: Yup.string().optional().default('0').label('Sugar'),
-      fiber: Yup.string().optional().default('0').label('Fiber'),
-      protein: Yup.string().optional().default('0').label('Protein'),
-      carbs: Yup.string().optional().default('0').label('Carbohydrates'),
-    })
-    .optional()
-    .label('Nutrients'),
+    .default(() => recipeYupNutrientsSchema.getDefault())
+    .label('Nutrients info'),
   image: Yup.string().optional().default('').label('Image'),
   images: Yup.array().of(Yup.string()).optional().default([]).label('Images'),
   ingredients: Yup.array().of(Yup.string()).optional().default(['']).label('Ingredients'),
@@ -76,7 +81,49 @@ export const recipeYupSchema = Yup.object().shape({
 export type Recipe = Yup.InferType<typeof recipeYupSchema>;
 
 export const createRecipeSchema = () => {
-  const defaultSchema = createDefaultSchema<Recipe>(recipeYupSchema);
+  const customFieldDefinitions = {
+    instructions: {
+      custom: {
+        list: {
+          reorderable: true,
+        },
+      },
+    },
+    'time.prep': {
+      custom: {
+        muiTextFieldProps: {
+          slotProps: {
+            input: {
+              startAdornment: <InputAdornment position="start">Min</InputAdornment>,
+            },
+          },
+        },
+      },
+    },
+    'time.cooking': {
+      custom: {
+        muiTextFieldProps: {
+          slotProps: {
+            input: {
+              startAdornment: <InputAdornment position="start">Min</InputAdornment>,
+            },
+          },
+        },
+      },
+    },
+    'time.total': {
+      custom: {
+        muiTextFieldProps: {
+          slotProps: {
+            input: {
+              startAdornment: <InputAdornment position="start">Min</InputAdornment>,
+            },
+          },
+        },
+      },
+    },
+  };
+  const defaultSchema = createDefaultSchema<Recipe>(recipeYupSchema, { customFieldDefinitions });
 
   const getKeywordsSuggestions = (recipes: Recipe[]) => {
     // Get all unique values from recipe keywords
@@ -102,13 +149,13 @@ export const createRecipeSchema = () => {
     }, []);
   };
 
-  const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {
+  const parseExternalRecipeData = (data: Partial<ExternalRecipe>): Partial<Recipe> => {
     const timeObject =
       data.prep_time || data.cook_time || data.total_time
         ? {
-            prep: data.prep_time,
-            cooking: data.cook_time,
-            total: data.total_time,
+            prep: data.prep_time || 0,
+            cooking: data.cook_time || 0,
+            total: data.total_time || 0,
           }
         : undefined;
     // TODO: doesnt work yet, example Paste boursin
@@ -203,27 +250,9 @@ export const createRecipeSchema = () => {
 
   return {
     ...defaultSchema,
-    getTemplate: () => {
-      return {
-        ...defaultSchema.getTemplate(),
-        id: defaultSchema.generateNanoId(),
-      };
-    },
     getKeywordsSuggestions,
     getCuisineSuggestions,
     fetchExternalData,
     //TODO: delete cleanup images etc
   };
 };
-
-//export type RecipeTemplate = Omit<Recipe, 'id'>;
-
-// console.log(extractSchemaLabels(recipeYupSchema));
-
-//export const recipeDefaultValues: Partial<Recipe> = recipeYupSchema.getDefault();
-
-//export const recipeFields = extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS);
-
-// console.log(recipeYupSchema.describe());
-// console.log(recipeYupSchema.fields);
-// console.log(extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS));
