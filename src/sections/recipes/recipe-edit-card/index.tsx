@@ -1,3 +1,4 @@
+import ImageCard from '@/components/default/images/image-card';
 import JsonEditor from '@/components/default/json-editor';
 import GridLayout from '@/components/default/ui/grid-layout';
 import LoadingButton from '@/components/default/ui/loading-button';
@@ -10,7 +11,6 @@ import { CustomForm } from '@/libs/forms';
 import AutocompleteChipList from '@/libs/forms/components/AutocompleteChipList';
 import CancelButton from '@/libs/forms/components/CancelButton';
 import Errors from '@/libs/forms/components/Errors';
-import Image from '@/libs/forms/components/Image';
 import Images from '@/libs/forms/components/Images';
 import JsonTextField from '@/libs/forms/components/JsonTextField';
 import List from '@/libs/forms/components/List';
@@ -21,9 +21,6 @@ import useCustomFormik from '@/libs/forms/use-custom-formik';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { createRecipeSchema, Recipe, recipeYupSchema } from '@/schemas/recipes/recipe';
 import useDataHelper from '@/schemas/use-data-helper';
-import CropIcon from '@mui/icons-material/Crop';
-import DeleteIcon from '@mui/icons-material/Delete';
-import StarIcon from '@mui/icons-material/Star';
 import { Box, Button, CardActions, Grid, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,32 +35,32 @@ interface externalDataActionInterface {
   error: string | null;
 }
 
-const imageActions = [
-  {
-    id: 'crop',
-    label: 'Crop image',
-    icon: <CropIcon color="primary" />,
-    action: (url: string) => {
-      console.log(url);
-    },
-  },
-  {
-    id: 'favorite',
-    label: 'Set as favorite',
-    icon: <StarIcon style={{ color: '#faaf00' }} />,
-    action: (url: string) => {
-      console.log(url);
-    },
-  },
-  {
-    id: 'delete',
-    label: 'Delete image',
-    icon: <DeleteIcon sx={{ color: 'red' }} />,
-    action: (url: string) => {
-      console.log(url);
-    },
-  },
-];
+// const imageActions = [
+//   {
+//     id: 'crop',
+//     label: 'Crop image',
+//     icon: <CropIcon color="primary" />,
+//     action: (url: string) => {
+//       console.log(url);
+//     },
+//   },
+//   {
+//     id: 'favorite',
+//     label: 'Set as favorite',
+//     icon: <StarIcon style={{ color: '#faaf00' }} />,
+//     action: (url: string) => {
+//       console.log(url);
+//     },
+//   },
+//   {
+//     id: 'delete',
+//     label: 'Delete image',
+//     icon: <DeleteIcon sx={{ color: 'red' }} />,
+//     action: (url: string) => {
+//       console.log(url);
+//     },
+//   },
+// ];
 
 const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
   //   const formik = useFormikContext<Recipe>();
@@ -74,6 +71,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
   const {
     data: recipes,
     setItem: setRecipe,
+    updateItem: updateRecipe,
     deleteItem: deleteRecipe,
   } = useDataHelper<Recipe>('recipes', { label: t('foodhub:defaults.recipe') });
   // const { set: setRecipe, delete: deleteRecipe } = recipeActions;
@@ -276,6 +274,22 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     [recipes]
   );
 
+  const saveImage = async (file: File) => {
+    if (recipe) {
+      const storageClass = new FirebaseStorageProvider();
+      const url = await storageClass.uploadFile(file, `uploads/recipes/${recipe.id}/${file.name}`);
+      updateRecipe(
+        {
+          image: url,
+        },
+        recipe.id
+      );
+    } else {
+      const url = URL.createObjectURL(file);
+      formik.setFieldValue('image', url);
+    }
+  };
+
   // useEffect(() => {
   //   // Temp to fix yields
   //   if (typeof formik?.values?.yields === 'string') {
@@ -305,10 +319,59 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
             // },
           }}
         >
-          <Image
+          {/* <Image
             name="image"
             field={fields.image}
             actions={imageActions}
+          /> */}
+          <ImageCard
+            imageUrl={recipe ? recipe.image : formik.values.image}
+            onSave={async (file) => {
+              console.log('Saving file ' + file.name);
+              await saveImage(file);
+            }}
+            // favorite={{
+            //   isFavorite: (url: string) => formik.values.image === url,
+            //   action: async (url: string) => {
+            //     formik.setFieldValue('image', url);
+            //   },
+            // }}
+            crop={{
+              action: async (file: File) => {
+                await saveImage(file);
+              },
+            }}
+            remove={{
+              action: async (url: string) => {
+                if (url.startsWith('blob:')) {
+                  URL.revokeObjectURL(url);
+                  if (recipe) {
+                    updateRecipe(
+                      {
+                        image: '',
+                      },
+                      recipe.id
+                    );
+                  } else {
+                    formik.setFieldValue('image', '');
+                  }
+                  // formik.setFieldValue('image', '');
+                } else if (url.startsWith('https://firebasestorage.googleapis.com')) {
+                  const storageClass = new FirebaseStorageProvider();
+                  await storageClass.deleteFile(url);
+                  if (recipe) {
+                    updateRecipe(
+                      {
+                        image: '',
+                      },
+                      recipe.id
+                    );
+                  } else {
+                    formik.setFieldValue('image', '');
+                  }
+                }
+              },
+            }}
           />
           <TextField field={fields.name} />
           <Rating
