@@ -16,6 +16,7 @@ interface ImageCropperProps {
   imageUrl: string;
   filename: string;
   onSave: (file: File, path: string) => Promise<string>;
+  onCancel?: () => void;
   dialog?: {
     isOpen: boolean;
     close: () => void;

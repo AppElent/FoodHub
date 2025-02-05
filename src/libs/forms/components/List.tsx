@@ -36,6 +36,9 @@ interface CustomListItemProps extends CustomListProps {
   name: string;
   index: number;
   remove: () => void;
+  muiTextFieldProps?: TextFieldProps;
+  muiListItemProps?: ListItemProps;
+  muiListItemTextProps?: ListItemTextProps;
 }
 
 const ListItem = ({ name, index, remove, ...props }: CustomListItemProps) => {
@@ -131,7 +134,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
                   >
                     <MUIList
                       dense
-                      {...newProps?.muiListProps}
+                      {...newProps}
                     >
                       {field.value?.map((_item: any, index: number) => (
                         <Draggable
@@ -153,7 +156,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
                                   name={`${field.name}.${index}`}
                                   index={index}
                                   remove={() => remove(index)}
-                                  {...newProps?.muiListItemProps}
+                                  {...newProps}
                                 />
                               </Box>
                             </Stack>

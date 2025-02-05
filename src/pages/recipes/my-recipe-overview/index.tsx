@@ -17,7 +17,10 @@ const MyRecipeOverviewPage = () => {
 
   return (
     <DefaultPage>
-      <RecipeOverview recipes={myRecipes || []} />
+      <RecipeOverview
+        recipes={myRecipes || []}
+        currentUser={auth.user?.id}
+      />
       {/* //{' '}
       </DefaultPaperbasePage> */}
     </DefaultPage>

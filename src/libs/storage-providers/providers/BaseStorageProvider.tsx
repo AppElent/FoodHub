@@ -34,18 +34,21 @@ export default class BaseStorageProvider {
     serverFileWrongSize: 'File on the server is not the same size as the file on the client.',
   };
 
-  async uploadBrowserBlob(folder: string, blobUrl: string, filename?: string): Promise<string> {
+  async uploadFromUrl(blobUrl: string, folder: string, filename?: string): Promise<string> {
     const blob = await fetch(blobUrl).then((r) => r.blob());
     const defFilename = filename || blobUrl.split('/').pop();
     const file = new File([blob], defFilename || 'file', { type: blob.type });
     const path = `${folder}/${defFilename}`;
     const imageUrl = await this.uploadFile(file, path);
+    if (blobUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(blobUrl);
+    }
 
     return imageUrl;
   }
 
-  uploadBrowserBlobs = (folder: string, urls: string[]) => {
-    return Promise.all(urls.map(async (url) => await this.uploadBrowserBlob(folder, url)));
+  uploadFromUrls = async (urls: string[], folder: string) => {
+    return Promise.all(urls.map(async (url) => await this.uploadFromUrl(url, folder)));
   };
 
   // You can also add helper methods that could be useful across storage classes.

@@ -14,7 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import NoImageAvailable from '../default/images/no-image-available';
 
-const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
+const RecipeCard = ({ recipe, currentUser }: { recipe: Recipe; currentUser?: string }) => {
   const { t } = useTranslation();
   const router = useRouter();
   return (
@@ -85,6 +85,15 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
         )}
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-end' }}>
+        {currentUser === recipe.owner && (
+          <Button
+            onClick={() => router.push(`${recipe.id}/edit`)}
+            variant="outlined"
+            size="small"
+          >
+            {t('common:actions.edit')}
+          </Button>
+        )}
         <Button
           onClick={() => router.push(recipe.id)}
           size="small"

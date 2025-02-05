@@ -12,44 +12,15 @@ import {
   CardMedia,
   IconButton,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import { JSX, useState } from 'react';
 import ImageCropper from '../../../components/default/images/image-cropper';
-
-// type Action = {
-//   icon: JSX.Element;
-//   label: string;
-//   action?: (url: string) => void;
-// };
-
-// type SpecificActions = {
-//   crop?: {
-//     icon?: JSX.Element;
-//     label?: string;
-//     action?: (url: string) => void;
-//   };
-//   delete: {
-//     icon?: JSX.Element;
-//     label?: string;
-//     action?: (url: string) => void;
-//   };
-//   favorite: {
-//     icon?: JSX.Element;
-//     isFavorite?: boolean;
-//     label?: string;
-//     action: (url: string) => void;
-//   };
-// }; //TODO: fix
-
-// type ActionObject = SpecificActions & {
-//   [key: string]: Action;
-// };
+// import ImageCard from './image-card';
 
 interface ImageCardProps {
-  // name?: string;
-  // field?: FieldConfig;
   imageUrl: string;
-  onSave: (file: File) => Promise<any>;
+  onUpload: (file: File) => Promise<any>;
   size?: {
     width: number;
     height: number;
@@ -61,6 +32,8 @@ interface ImageCardProps {
   };
   crop?: {
     action: (file: File) => Promise<any>;
+    // url?: string;
+    // setUrl: (url: string) => void;
     label?: string;
     icon?: JSX.Element;
   };
@@ -70,59 +43,29 @@ interface ImageCardProps {
     icon?: JSX.Element;
     isFavorite: boolean | ((url: string) => boolean);
   };
-
-  // old
-  // uploadImage?: (file: File) => Promise<string>;
-  // deleteImage?: (url: string) => Promise<void>;
-  // postProcess?: () => Promise<any>;
-  // getFavorite?: (url: string) => boolean;
-  // setFavorite?: (url: string) => void;
-  // cropImage?: (url: string) => Promise<string>;
-  // actions?: {
-  //   id: string;
-  //   icon: JSX.Element;
-  //   label: string;
-  //   action: (url: string) => void;
-  // }[];
-  // actionObject?: ActionObject;
   showUploadButton?: boolean;
   showTitle?: boolean;
 }
 
 const ImageCard = ({
-  // name,
-  // field: fieldConfig,
   imageUrl,
-  onSave,
+  onUpload,
   size,
+  remove,
   crop,
   favorite,
-  remove,
-  // actions = [],
+  showTitle = false,
   showUploadButton = true,
-  showTitle = true,
-  // deleteImage,
-  // cropImage,
 }: ImageCardProps) => {
-  // if (!name && !fieldConfig) {
-  //   throw new Error('Either name or field must be provided');
-  // }
-  // const fieldName = name || fieldConfig?.name;
-  // const data = useFormField(fieldName as string, fieldConfig);
-  // const { options, field, helpers } = data;
   const [cropperUrl, setCropperUrl] = useState<string | undefined>(undefined);
-
-  // const newProps = _.merge({}, options, props);
-
-  // const image = field.value || '';
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       // Determine if these are the first images uploaded
       const filesArray = Array.from(event.target.files);
       const file = filesArray[0];
-      if (onSave) {
-        await onSave(file);
+      if (onUpload) {
+        await onUpload(file);
       }
       // const result = await props.onSave(file);
       // const url = URL.createObjectURL(file);
@@ -130,44 +73,8 @@ const ImageCard = ({
     }
   };
 
-  const isFavorite = favorite
-    ? typeof favorite.isFavorite === 'function'
-      ? favorite.isFavorite(imageUrl)
-      : favorite.isFavorite
-    : false;
-
-  // const handleDelete = (id: string) => {
-  //   if (deleteImage) {
-  //     deleteImage(id);
-  //   }
-  //   helpers.setValue('');
-  // };
-
   return (
     <Box>
-      {/* <Typography
-        variant="h6"
-        gutterBottom
-      >
-        Upload Image
-      </Typography>
-
-      {/* Upload Button */}
-      {/* <Button
-        variant="contained"
-        component="label"
-        startIcon={<AddPhotoAlternateIcon />}
-        {...newProps?.muiButtonProps}
-      >
-        Upload Image
-        <input
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={handleUpload}
-        />
-      </Button> */}
-
       {/* Display Images */}
       <Box
         display="flex"
@@ -216,31 +123,7 @@ const ImageCard = ({
               />
             </Button>
           )}
-          {/* {actions?.length > 0 && (
-            <CardActions sx={{ justifyContent: 'flex-end' }}>
-              {actions.map((action) => (
-                <Tooltip
-                  key={action.id}
-                  title={action.label}
-                  placement="top"
-                >
-                  <IconButton
-                    onClick={() => action.action(image)}
-                    // disabled={image.isDefault}
-                  >
-                    {action.icon}
-                  </IconButton>
-                </Tooltip>
-                // <Button
-                //   key={action.id}
-                //   onClick={() => action.action(image)}
-                // >
-                //   {action.icon}
-                //   {action.label}
-                // </Button>
-              ))}
-            </CardActions>
-          )} */}
+
           {(crop || remove || favorite) && (
             <CardActions style={{ justifyContent: 'flex-end' }}>
               {/* Crop image */}
@@ -271,7 +154,11 @@ const ImageCard = ({
                     //disabled={image}
                   >
                     {favorite.icon ||
-                      (isFavorite ? <StarIcon style={{ color: '#faaf00' }} /> : <StarBorderIcon />)}
+                      (favorite.isFavorite ? (
+                        <StarIcon style={{ color: '#faaf00' }} />
+                      ) : (
+                        <StarBorderIcon />
+                      ))}
                   </IconButton>
                 </Tooltip>
               )}
@@ -316,4 +203,117 @@ const ImageCard = ({
   );
 };
 
-export default ImageCard;
+interface ImageUploaderCardProps {
+  imageUrls: string | string[];
+  onUpload: (files: File[]) => Promise<any>;
+  size?: {
+    width: number;
+    height: number;
+  };
+  remove?: {
+    action: (url: string) => Promise<any>;
+    label?: string;
+    icon?: JSX.Element;
+  };
+  crop?: {
+    action: (file: File) => Promise<any>;
+    label?: string;
+    icon?: JSX.Element;
+  };
+  favorite?: {
+    action: (url: string) => Promise<any>;
+    label?: string;
+    icon?: JSX.Element;
+    isFavorite: boolean | ((url: string) => boolean);
+  };
+}
+
+const ImageUploaderCard = ({
+  imageUrls,
+  onUpload,
+  size,
+  crop,
+  favorite,
+  remove,
+}: ImageUploaderCardProps) => {
+  const multiple = Array.isArray(imageUrls);
+  const urls = multiple ? imageUrls : [imageUrls];
+
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      // Determine if these are the first images uploaded
+      const filesArray = Array.from(event.target.files);
+      if (onUpload) {
+        await onUpload(filesArray);
+      }
+    }
+  };
+
+  return (
+    <Box>
+      <Typography
+        variant="h6"
+        gutterBottom
+      >
+        Upload Image
+      </Typography>
+
+      {/* Show upload button on top if multiple */}
+      {multiple && (
+        <Button
+          variant="contained"
+          component="label"
+          startIcon={<AddPhotoAlternateIcon />}
+          // {...newProps?.muiButtonProps}
+        >
+          Upload Images
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={handleUpload}
+          />
+        </Button>
+      )}
+
+      {/* Display Images */}
+      <Box
+        display="flex"
+        flexWrap="wrap"
+        gap={2}
+        mt={0}
+        justifyContent="flex-start"
+      >
+        {urls.map((imageUrl: string) => {
+          const favoriteObject = favorite
+            ? {
+                ...favorite,
+                isFavorite:
+                  typeof favorite.isFavorite === 'function'
+                    ? favorite.isFavorite(imageUrl)
+                    : favorite.isFavorite,
+              }
+            : undefined;
+          return (
+            <ImageCard
+              key={imageUrl}
+              imageUrl={imageUrl}
+              onUpload={async (file: File) => {
+                onUpload([file]);
+              }}
+              size={size}
+              crop={crop}
+              favorite={favoriteObject}
+              remove={remove}
+              showUploadButton={multiple === false}
+              showTitle={multiple === false}
+            />
+          );
+        })}
+      </Box>
+    </Box>
+  );
+};
+
+export default ImageUploaderCard;

@@ -1,4 +1,4 @@
-import ImageCard from '@/components/default/images/image-card';
+import ImageUploaderCard from '@/components/default/images/image-uploader-card';
 import JsonEditor from '@/components/default/json-editor';
 import GridLayout from '@/components/default/ui/grid-layout';
 import LoadingButton from '@/components/default/ui/loading-button';
@@ -25,7 +25,7 @@ import { Box, Button, CardActions, Grid, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface RecipeEditDialogProps {
+interface RecipeEditCardProps {
   recipe?: Recipe | null;
   //saveRecipe: (recipe: Recipe, id: string) => Promise<Recipe>;
 }
@@ -35,35 +35,7 @@ interface externalDataActionInterface {
   error: string | null;
 }
 
-// const imageActions = [
-//   {
-//     id: 'crop',
-//     label: 'Crop image',
-//     icon: <CropIcon color="primary" />,
-//     action: (url: string) => {
-//       console.log(url);
-//     },
-//   },
-//   {
-//     id: 'favorite',
-//     label: 'Set as favorite',
-//     icon: <StarIcon style={{ color: '#faaf00' }} />,
-//     action: (url: string) => {
-//       console.log(url);
-//     },
-//   },
-//   {
-//     id: 'delete',
-//     label: 'Delete image',
-//     icon: <DeleteIcon sx={{ color: 'red' }} />,
-//     action: (url: string) => {
-//       console.log(url);
-//     },
-//   },
-// ];
-
-const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
-  //   const formik = useFormikContext<Recipe>();
+const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
   const auth = useAuth({ redirectUnauthenticated: true });
   // Translation
   const { t } = useTranslation();
@@ -74,7 +46,6 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     updateItem: updateRecipe,
     deleteItem: deleteRecipe,
   } = useDataHelper<Recipe>('recipes', { label: t('foodhub:defaults.recipe') });
-  // const { set: setRecipe, delete: deleteRecipe } = recipeActions;
   // Loading external data state
   const [externalDataAction, setExternalDataAction] = useState<externalDataActionInterface>({
     loading: false,
@@ -94,24 +65,6 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
       router.push('recipes');
     }
   });
-
-  const fetchExternalData = useCallback(async (url: string) => {
-    if (url) {
-      setExternalDataAction({ loading: true, error: null });
-      try {
-        const recipeData = await createRecipeSchema().fetchExternalData(url);
-        formik.setValues({
-          ...formik.values,
-          ...recipeData,
-        });
-      } catch (e: any) {
-        console.error(e);
-        setExternalDataAction({ loading: false, error: e.message });
-      } finally {
-        setExternalDataAction({ loading: false, error: externalDataAction.error });
-      }
-    }
-  }, []);
 
   const initialValues = useMemo(() => {
     const recipeValues = recipe || createRecipeSchema().getTemplate();
@@ -173,6 +126,27 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     },
   });
 
+  const fetchExternalData = useCallback(
+    async (url: string) => {
+      if (url) {
+        setExternalDataAction({ loading: true, error: null });
+        try {
+          const recipeData = await createRecipeSchema().fetchExternalData(url);
+          formik.setValues({
+            ...formik.values,
+            ...recipeData,
+          });
+        } catch (e: any) {
+          console.error(e);
+          setExternalDataAction({ loading: false, error: e.message });
+        } finally {
+          setExternalDataAction({ loading: false, error: externalDataAction.error });
+        }
+      }
+    },
+    [externalDataAction.error, formik]
+  );
+
   // Receive url query param and fetch recipe data
   useQueryParamAction('url', (url) => {
     const fetchDataAndUpdateFormik = async () => {
@@ -186,57 +160,12 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     }
   });
 
-  // // Fetch recipe data from api
-  // const {
-  //   data: externalRecipeData,
-  //   loading,
-  //   error: fetchUrlError,
-  //   fetchData,
-  // } = useFetch<{ status: string; data: ExternalRecipe }>(
-  //   `https://api-python.appelent.site/recipes/scrape?url=${formik?.values.url}`,
-  //   {
-  //     autoFetch: false,
-  //   }
-  // );
-
-  // useEffect(() => {
-  //   if (externalRecipeData) {
-  //     if (externalRecipeData && externalRecipeData.status === 'success') {
-  //       formik.setValues({
-  //         ...formik.values,
-  //         ...parseExternalRecipeData(externalRecipeData.data),
-  //       });
-  //     }
-  //     //formik.handleSubmit();
-  //   }
-  // }, [externalRecipeData]); //TODO: just a normal fetch function and error in state
-
   useEffect(() => {
     console.log('FORMIK', formik);
   }, [formik.values]);
 
-  //   // Generate new ID
-  //   const id = useGuid();
-  //   const recipeId = recipe?.id || id;
-
-  //   const { data: recipes, actions: recipeActions } = useData<Recipe>('recipes');
-
-  //   // Receive url query param and fetch recipe data
-  //   useQueryParamAction('url', (url) => {
-  //     const fetchDataAndUpdateFormik = async () => {
-  //       await formik.setFieldValue('url', url);
-  //       await fetchData(`https://api-python.appelent.site/recipes/scrape?url=${url}`);
-  //     };
-  //     if (url && formik.values.url !== url && !loading) {
-  //       //TODO: check if valid url using formik
-  //       fetchDataAndUpdateFormik();
-  //     }
-  //   });
-
   // Router instance
   const router = usePathRouter();
-
-  //   const { set: setRecipe, delete: deleteRecipe } = recipeActions;
 
   // Delete all images that are uploaded to firebasestorage
   const deleteRecipeAndImages = async (recipeId: string) => {
@@ -256,13 +185,6 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     await deleteRecipe(recipeId);
   };
 
-  //   const initialValues = useMemo(() => {
-  //     return {
-  //       owner: auth.user?.id,
-  //       ...recipe,
-  //     };
-  //   }, [recipe, auth.user]);
-
   // Get fields and suggestions
   const fields = useMemo(() => createRecipeSchema().getFieldDefinitions(), []);
   const keywordSuggestions = useMemo(
@@ -274,36 +196,47 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
     [recipes]
   );
 
-  const saveImage = async (file: File) => {
+  const saveImages = async (files: File[]) => {
+    const currentImages = recipe ? recipe.images : formik.values.images;
+
     if (recipe) {
       const storageClass = new FirebaseStorageProvider();
-      const url = await storageClass.uploadFile(file, `uploads/recipes/${recipe.id}/${file.name}`);
+      const urls = await Promise.all(
+        files.map(async (file) => {
+          return await storageClass.uploadFile(file, `uploads/recipes/${recipe.id}/${file.name}`);
+        })
+      );
+      const newImages = Array.from(new Set([...currentImages, ...urls]));
       updateRecipe(
         {
-          image: url,
+          images: newImages,
+          image: recipe.image && recipe.image !== '' ? recipe.image : urls[0],
         },
         recipe.id
       );
     } else {
-      const url = URL.createObjectURL(file);
-      formik.setFieldValue('image', url);
+      const urls = files.map((file) => URL.createObjectURL(file));
+      if (!formik.values.image) {
+        formik.setFieldValue('image', urls[0]);
+      }
+
+      const newImages = Array.from(new Set([...currentImages, ...urls]));
+      console.log(currentImages);
+      formik.setFieldValue('images', newImages);
     }
   };
 
-  // useEffect(() => {
-  //   // Temp to fix yields
-  //   if (typeof formik?.values?.yields === 'string') {
-  //     formik.setFieldValue('yields', undefined);
-  //   }
-  // }, [formik?.values?.yields]);
-
-  //   // Conditions for disabling submit button
-  //   const disableSubmit =
-  //     formik?.isSubmitting || loading || !formik?.isValid || !formik?.dirty || formik?.isValidating;
+  const images = useMemo(() => {
+    const allImages = recipe ? recipe.images || [] : formik.values.images || [];
+    const image = recipe ? recipe.image : formik.values.image;
+    if (image && image !== '' && !allImages.includes(image)) {
+      allImages.push(image);
+    }
+    return allImages;
+  }, [recipe, formik.values.images, formik.values.image]);
 
   return (
     <>
-      {' '}
       {fields && (
         <CustomForm
           formik={formik}
@@ -314,28 +247,168 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               variant: 'outlined',
               multiline: true,
             },
-            // muiRatingProps: {
-            //   size: 'large',
-            // },
           }}
         >
-          {/* <Image
-            name="image"
-            field={fields.image}
-            actions={imageActions}
+          <ImageUploaderCard
+            imageUrls={images}
+            onUpload={async (files) => {
+              await saveImages(files);
+            }}
+            size={{
+              width: 150,
+              height: 100,
+            }}
+            remove={{
+              action: async (url: string) => {
+                const currentImage = recipe ? recipe.image : formik.values.image;
+                const currentImages = recipe ? recipe.images : formik.values.images;
+                const newImages = currentImages.filter((img: string) => img !== url);
+                const newImage = currentImage === url ? newImages[0] : currentImage;
+                if (url.startsWith('blob:')) {
+                  URL.revokeObjectURL(url);
+                } else if (url.startsWith('https://firebasestorage.googleapis.com')) {
+                  try {
+                    const storageClass = new FirebaseStorageProvider();
+                    await storageClass.deleteFile(url);
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }
+                if (recipe) {
+                  updateRecipe(
+                    {
+                      images: newImages,
+                      image: newImage,
+                    },
+                    recipe.id
+                  );
+                } else {
+                  formik.setFieldValue('images', newImages);
+                  formik.setFieldValue('image', newImage);
+                }
+              },
+            }}
+            favorite={{
+              action: async (url: string) => {
+                const images = recipe ? recipe.images : formik.values.images;
+                const currentImage = recipe ? recipe.image : formik.values.image;
+                const newImages =
+                  currentImage !== '' ? Array.from(new Set([...images, currentImage])) : images;
+                if (currentImage !== url) {
+                  formik.setFieldValue('image', url);
+                  formik.setFieldValue('images', newImages);
+                  if (recipe) {
+                    updateRecipe(
+                      {
+                        image: url,
+                        images: newImages,
+                      },
+                      recipe.id
+                    );
+                  }
+                }
+              },
+              isFavorite: (url: string) => {
+                return recipe ? recipe.image === url : formik.values.image === url;
+              },
+            }}
+            crop={{
+              action: async (file: File) => {
+                await saveImages([file]);
+              },
+            }}
+          />
+          {/* <ImageUploaderCard
+            imageUrls={formik.values.image}
+            onUpload={async (files) => {
+              await saveImages(files);
+            }}
           /> */}
-          <ImageCard
+
+          {/* <ImageCards
+            imageUrls={formik.values.images}
+            onSave={async (files) => {
+              await saveImages(files);
+            }}
+            showUploadButton={false}
+            size={{
+              width: 150,
+              height: 100,
+            }}
+            crop={{
+              action: async (file: File) => {
+                await saveImages([file]);
+              },
+            }}
+            remove={{
+              action: async (url: string) => {
+                const newImages = formik.values.images.filter((img: string) => img !== url);
+                if (url.startsWith('blob:')) {
+                  URL.revokeObjectURL(url);
+
+                  if (recipe) {
+                    updateRecipe(
+                      {
+                        images: newImages,
+                      },
+                      recipe.id
+                    );
+                  } else {
+                    formik.setFieldValue('images', newImages);
+                  }
+                  // formik.setFieldValue('image', '');
+                } else if (url.startsWith('https://firebasestorage.googleapis.com')) {
+                  try {
+                    const storageClass = new FirebaseStorageProvider();
+                    await storageClass.deleteFile(url);
+                  } catch (e) {
+                    console.error(e);
+                  }
+                  if (recipe) {
+                    updateRecipe(
+                      {
+                        images: newImages,
+                      },
+                      recipe.id
+                    );
+                  } else {
+                    formik.setFieldValue('images', newImages);
+                  }
+                }
+              },
+            }}
+            favorite={{
+              action: async (url: string) => {
+                if (recipe && recipe.image !== url) {
+                  updateRecipe(
+                    {
+                      image: url,
+                      images:
+                        recipe.image && recipe.image !== ''
+                          ? [...recipe.images, recipe.image]
+                          : recipe.images,
+                    },
+                    recipe.id
+                  );
+                } else if (formik.values.image !== url) {
+                  const newImages = formik.values.image
+                    ? [...formik.values.images, formik.values.image]
+                    : formik.values.images;
+                  formik.setFieldValue('image', url);
+                  formik.setFieldValue('images', newImages);
+                }
+              },
+              isFavorite: (url: string) => {
+                return formik.values.image === url;
+              },
+            }}
+          /> */}
+          {/* <ImageCard
             imageUrl={recipe ? recipe.image : formik.values.image}
             onSave={async (file) => {
               console.log('Saving file ' + file.name);
               await saveImage(file);
             }}
-            // favorite={{
-            //   isFavorite: (url: string) => formik.values.image === url,
-            //   action: async (url: string) => {
-            //     formik.setFieldValue('image', url);
-            //   },
-            // }}
             crop={{
               action: async (file: File) => {
                 await saveImage(file);
@@ -372,7 +445,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
                 }
               },
             }}
-          />
+          /> */}
           <TextField field={fields.name} />
           <Rating
             field={fields.score}
@@ -426,7 +499,10 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
             suggestions={cuisineSuggestions}
           />
           <List field={fields.ingredients} />
-          <List field={fields.instructions} />
+          <List
+            field={fields.instructions}
+            muiTextFieldProps={{ multiline: true }}
+          />
           <TextField field={fields.comments} />
           <GridLayout
             itemProps={{ xs: 12, md: 4, lg: 4 }}
@@ -469,6 +545,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditDialogProps) => {
               return '';
             }}
           />
+
           <Errors fields={fields} />
 
           {getLogLevel() === 'debug' && (
