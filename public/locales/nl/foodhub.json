@@ -59,6 +59,11 @@
       "description": "Welkom bij FoodHub! Jouw one-stop shop voor alles wat met eten te maken heeft.",
       "featured": "Uitgelichte Recepten",
       "categories": "Blader door recepten per categorie."
+    },
+    "edit-recipe": {
+      "get-recipe-information": "Haal receptinformatie op",
+      "recipe-information-retrieved": "Recept informatie opgehaald",
+      "recipe-information-retrieval-error": "Recept kan niet opgehaald worden"
     }
   },
   "menu": {

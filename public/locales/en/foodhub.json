@@ -64,7 +64,9 @@
       "categories": "Browse recipes by category."
     },
     "edit-recipe": {
-      "get-recipe-information": "Get recipe information"
+      "get-recipe-information": "Get recipe information",
+      "recipe-information-retrieved": "Recipe information retrieved sucessfully",
+      "recipe-information-retrieval-error": "Recipe cannot be retrieved"
     }
   },
   "menu": {

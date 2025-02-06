@@ -11,7 +11,6 @@ import { CustomForm } from '@/libs/forms';
 import AutocompleteChipList from '@/libs/forms/components/AutocompleteChipList';
 import CancelButton from '@/libs/forms/components/CancelButton';
 import Errors from '@/libs/forms/components/Errors';
-import Images from '@/libs/forms/components/Images';
 import JsonTextField from '@/libs/forms/components/JsonTextField';
 import List from '@/libs/forms/components/List';
 import Rating from '@/libs/forms/components/Rating';
@@ -24,6 +23,7 @@ import useDataHelper from '@/schemas/use-data-helper';
 import { Box, Button, CardActions, Grid, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 interface RecipeEditCardProps {
   recipe?: Recipe | null;
@@ -136,8 +136,10 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
             ...formik.values,
             ...recipeData,
           });
+          toast.success(t('foodhub:pages.edit-recipe.recipe-information-retrieved'));
         } catch (e: any) {
           console.error(e);
+          toast.error(t('foodhub:pages.edit-recipe.recipe-information-retrieval-error'));
           setExternalDataAction({ loading: false, error: e.message });
         } finally {
           setExternalDataAction({ loading: false, error: externalDataAction.error });
@@ -520,7 +522,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
           <TextField field={fields.yieldsText} />
           <TextField field={fields['nutrients.calories']} />
 
-          <Images
+          {/* <Images
             field={fields.images}
             uploadImage={async (file) => {
               const storageClass = new FirebaseStorageProvider();
@@ -544,7 +546,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
             cropImage={async (_url: string) => {
               return '';
             }}
-          />
+          /> */}
 
           <Errors fields={fields} />
 
@@ -568,7 +570,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
                 variant="outlined"
                 color="error"
               >
-                Delete
+                {t('common.actions.delete')}{' '}
               </Button>
             )}
             <CancelButton onClick={() => router.push('myRecipes')}>Cancel</CancelButton>

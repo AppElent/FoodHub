@@ -45,7 +45,6 @@
         "haveAccount": "Have an account?"
       }
     },
-
     "updatePassword": {
       "title": "Update password",
       "fields": {
