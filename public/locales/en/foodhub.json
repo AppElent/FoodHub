@@ -1,7 +1,7 @@
 {
   "defaults": {
-    "recipes": "Recipes",
-    "recipe": "Recipe"
+    "recipe_one": "Recipe",
+    "recipe_other": "Recipes"
   },
   "data": {
     "RECIPE_KEYWORDS": [
@@ -23,28 +23,27 @@
   },
   "schemas": {
     "recipe": {
-      "name": "Name",
-      "description": "Description",
-      "time": {
-        "prep": "Prepare",
-        "cook": "Cooking",
-        "total": "Total"
-      },
-      "yields": {
-        "quantity": "Quantity",
-        "unit": "Unit"
-      },
-      "nutrients": {
-        "value": "Nutritional information",
-        "calories": "Calories",
-        "fat": "Fat",
-        "sugar": "Sugar",
-        "protein": "Protein",
-        "fiber": "Fiber",
-        "carbs": "Carbohydrates"
-      },
-      "image": "Image",
-      "images": "Images",
+      "id": "$t(common:fields.id)",
+      "owner": "$t(common:fields.owner)",
+      "name": "$t(common:fields.name)",
+      "description": "$t(common:fields.description)",
+      "time": "Time",
+      "prep": "Prepare",
+      "cooking": "Cooking",
+      "total": "Total",
+      "yields": "Yields",
+      "yieldsText": "Yields",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "nutrients": "Nutritional information",
+      "calories": "Calories",
+      "fat": "Fat",
+      "sugar": "Sugar",
+      "protein": "Protein",
+      "fiber": "Fiber",
+      "carbs": "Carbohydrates",
+      "image": "$t(common:fields.image)",
+      "images": "$t(common:fields.images)",
       "ingredients": "Ingredients",
       "instructions": "Instructions",
       "comments": "Comments",
@@ -53,8 +52,25 @@
       "category": "Category",
       "keywords": "Keywords",
       "cuisine": "Cuisine",
-      "createdAt": "Date Published",
-      "updatedAt": "Date Modified"
+      "site": "Site",
+      "raw": "Raw",
+      "createdAt": "$t(common:fields.createdAt)",
+      "updatedAt": "$t(common:fields.updatedAt)"
+    },
+    "foodtracker": {
+      "foodtracker": "Food Tracker"
+    },
+    "favorites": {
+      "favorites": "Favorites",
+      "wine": {
+        "wine": "Wine"
+      },
+      "beer": {
+        "beer": "Beer"
+      },
+      "cheese": {
+        "cheese": "Cheese"
+      }
     }
   },
   "pages": {

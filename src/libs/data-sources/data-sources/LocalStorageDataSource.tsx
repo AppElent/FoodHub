@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 import { DataSourceInitOptions } from '..';
 import BaseDataSource from './BaseDataSource';
 
@@ -79,11 +80,13 @@ export class LocalStorageDataSource<T> extends BaseDataSource<T> {
   }
 
   // Update an existing item by ID
-  async update(data?: T, id: any): Promise<void> {
+  async update(data?: Partial<T>): Promise<void> {
+    const id = data?.[this.options.idField as string];
     await super.update(data, id);
     // this.validate(data);
     if (this.options?.targetMode === 'document') {
-      const newData = id ? { ...this.getData(), ...id } : { ...this.getData(), ...data };
+      console.log('SAVING', data, id);
+      const newData = { ...this.getData(), ...data };
       this.saveData(newData);
       return;
     }
@@ -98,7 +101,8 @@ export class LocalStorageDataSource<T> extends BaseDataSource<T> {
   }
 
   // Set an existing item by ID
-  async set(data?: T, id?: any): Promise<void> {
+  async set(data?: T): Promise<void> {
+    const id = data?.[this.options.idField as string];
     await super.set(data, id);
     // this.validate(data);
     if (this.options?.targetMode === 'document') {
@@ -106,10 +110,10 @@ export class LocalStorageDataSource<T> extends BaseDataSource<T> {
       return;
     }
     const existingData = this.getData();
-    const itemIndex = existingData.findIndex((d: any) => d.id === id);
+    const itemIndex = existingData.findIndex((d: any) => d[this.options.idField] === id);
     if (itemIndex === -1) {
       existingData.push({
-        id,
+        [this.options.idField]: id,
         ...data,
       });
     } else {

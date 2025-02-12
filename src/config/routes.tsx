@@ -4,14 +4,10 @@ import { Outlet, RouteObject } from 'react-router-dom';
 import PaperbaseLayout from '@/layouts/paperbase/Layout';
 import NotFound from '@/pages/default/404';
 import SignIn from '@/pages/default/SignIn';
-import TestAuthProviders from '@/pages/default/test/auth-providers';
-import DataSources from '@/pages/default/test/data-sources/index';
-import FileUploads from '@/pages/default/test/file-uploads';
-import FiltersPage from '@/pages/default/test/filters-page';
-import Forms from '@/pages/default/test/forms';
-import SchemaPage from '@/pages/default/test/schema-page';
-import Translations from '@/pages/default/test/translations';
-import Wine from '@/pages/favorites/wine';
+import TestPage from '@/pages/default/test/test-page';
+import BeerHomePage from '@/pages/favorites/beer';
+import CheeseHomePage from '@/pages/favorites/cheese';
+import WineHomePage from '@/pages/favorites/wine';
 import FoodtrackerHome from '@/pages/foodtracker/home';
 import HomePage from '@/pages/recipes/home';
 import MyRecipeDetailsPage from '@/pages/recipes/my-recipe-details';
@@ -21,7 +17,6 @@ import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
 import RecipeDetailsPage from '@/pages/recipes/recipe-details';
 import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import { CustomRouteObject, routes as routesImport } from './routing';
-import Cheese from '@/pages/favorites/cheese';
 
 const routeElements: { [key: string]: JSX.Element } = {
   home: (
@@ -33,6 +28,8 @@ const routeElements: { [key: string]: JSX.Element } = {
   ),
   // Recipe pages
   homeIndex: <HomePage />,
+  testsIndex: <TestPage />,
+  testsDetail: <TestPage />,
   recipesIndex: <RecipeOverviewPage />,
   myRecipes: <MyRecipeOverviewPage />,
   myRecipesIndex: <MyRecipeOverviewPage />,
@@ -44,16 +41,9 @@ const routeElements: { [key: string]: JSX.Element } = {
   foodtrackerIndex: <FoodtrackerHome />,
   // Favorites pages
   favoritesIndex: <div>Favorites</div>,
-  wine: <Wine />,
-  cheese: <Cheese />,
-  // Test pages
-  testDataSources: <DataSources />,
-  testFileUploads: <FileUploads />,
-  testAuthProviders: <TestAuthProviders />,
-  testForms: <Forms />,
-  testTranslations: <Translations />,
-  testFilters: <FiltersPage />,
-  testSchemas: <SchemaPage />,
+  wine: <WineHomePage />,
+  cheese: <CheeseHomePage />,
+  beer: <BeerHomePage />,
   // Default pages
   login: <SignIn mode="signin" />,
   signup: <SignIn mode="signup" />,

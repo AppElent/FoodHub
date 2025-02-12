@@ -1,39 +1,32 @@
 import CustomDialog from '@/components/default/custom-dialog';
-import { db } from '@/config/firebase';
-import { useData } from '@/libs/data-sources';
-import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
+import useDataMutation from '@/libs/data-sources/use-data-mutation';
 import { CustomForm } from '@/libs/forms';
 import FormButton from '@/libs/forms/components/SubmitButton';
 import TextField from '@/libs/forms/components/TextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
-import { Issue, issueFields, issueYupSchema } from '@/schemas/issue';
+import { Issue, issueFields, issueYupSchema } from '@/schemas/issue/issue';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import { Button, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
+import { DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
-const issueDatasource = new FirestoreDataSource<Issue>(
-  {
-    target: 'issues',
-    targetMode: 'collection',
-    subscribe: false,
-    YupValidationSchema: issueYupSchema,
-    //mockOptions: { schema: iss },
-  },
-  { db }
-);
-
 const IssueDialog = () => {
   const { t } = useTranslation();
-  const datasource = useData<Issue>('issues', { datasource: issueDatasource });
+  // const { data } = useDataQuery<Issue[]>({
+  //   queryKey: ['issues'],
+  // });
+  const addIssue = useDataMutation<Issue>('add', {
+    mutationKey: ['issues'],
+  });
+  // const datasource = useData<Issue>('issues', { datasource: issueDatasource });
   const [dialogData, setDialogData] = useState<string | undefined>(undefined);
   const formik = useCustomFormik({
     initialValues: { title: '', description: '' },
     validationSchema: issueYupSchema,
     onSubmit: async (values, _formikHelpers) => {
       try {
-        await datasource.actions.add(values);
+        await addIssue.mutate(values);
         toast.success(t('common:notifications.submitSuccess', { resource: 'Issue' }));
         formik.resetForm();
       } catch (e) {
@@ -75,7 +68,7 @@ const IssueDialog = () => {
                 field={issueFields.description}
               />
               <FormButton>Submit</FormButton>
-              <Button
+              {/* <Button
                 color="primary"
                 onClick={async () => {
                   datasource.actions.getAll().then((d: any) => console.log(d));
@@ -83,7 +76,7 @@ const IssueDialog = () => {
                 variant="outlined"
               >
                 Get issues
-              </Button>
+              </Button> */}
             </CustomForm>
           </DialogContent>
         </CustomDialog>

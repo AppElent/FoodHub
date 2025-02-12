@@ -2,11 +2,11 @@ import { CustomForm } from '@/libs/forms';
 import FormGrid from '@/libs/forms/components/FormGrid';
 import JsonTextField from '@/libs/forms/components/JsonTextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
-import DefaultPage from '@/pages/default/DefaultPage';
-import { createDummySchema, dummyYupSchema } from '@/schemas/dummy';
+import { createDummySchema, dummyYupSchema } from '@/schemas/dummy/dummy';
+import { Box } from '@mui/material';
 import { useMemo } from 'react';
 
-const Forms = () => {
+const FormsTestPage = () => {
   const dummySchema = useMemo(() => createDummySchema(), []);
   const formik = useCustomFormik({
     initialValues: dummySchema.generateMockData(),
@@ -25,13 +25,13 @@ const Forms = () => {
   }, [dummySchema]);
 
   return (
-    <DefaultPage>
+    <Box>
       <CustomForm formik={formik}>
         <FormGrid items={items} />
         <JsonTextField />
       </CustomForm>
-    </DefaultPage>
+    </Box>
   );
 };
 
-export default Forms;
+export default FormsTestPage;

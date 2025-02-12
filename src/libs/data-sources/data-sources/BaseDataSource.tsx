@@ -13,45 +13,44 @@ export interface ValidationResult {
   values: any;
 }
 
-class BaseDataSource<T, Z = T[]> {
-  protected defaultOptions: Partial<DataSourceInitOptions<T, Z>> = {
+class BaseDataSource<TData, TDataResult = TData[]> {
+  protected defaultOptions: Partial<DataSourceInitOptions<TData>> = {
     targetMode: 'collection' as const,
     subscribe: false,
     converter: {
-      toDatabase: (data: T): any => data,
-      fromDatabase: (data: any): T => data,
+      toDatabase: (data: TData): any => data,
+      fromDatabase: (data: any): TData => data,
     },
-    idField: 'id' as keyof T,
+    idField: 'id' as keyof TData,
     timestamps: {
       createdAt: 'createdAt',
       updatedAt: 'updatedAt',
     },
   };
-  options: DataSourceInitOptions<T, Z>;
+  public options: DataSourceInitOptions<TData>;
   private converter = {
-    toDatabase: (data: T): any => data,
-    fromDatabase: (data: any): T => data,
+    toDatabase: (data: TData): any => data,
+    fromDatabase: (data: any): TData => data,
     //preDelete: (id: string) => any //TODO: implement preDelete
   };
-  defaultValue: any = null;
-  providerConfig: any;
-  provider: string;
-  data?: Z | T[] | T;
-  subscribers: Array<(data: T | null) => void> = [];
+  public defaultValue: TDataResult | null = null;
+  public providerConfig: any;
+  public provider: string;
+  public data: TDataResult;
+  public subscribers: Array<(data: TData | null) => void> = [];
 
-  constructor(options: DataSourceInitOptions<T, Z>, providerConfig?: any) {
+  constructor(options: DataSourceInitOptions<TData>, providerConfig?: any) {
     this.provider = 'Base';
     this.providerConfig = providerConfig;
-    this.options = {
-      ...this.defaultOptions,
-      ...options,
-    };
+    this.options = _.merge({}, this.defaultOptions, options) as DataSourceInitOptions<TData>;
     this.converter = this.options.converter || this.converter!;
     if (new.target === BaseDataSource && !this.options?.data) {
       throw new TypeError('When constructing BaseDataSource directly, data is required');
     }
     if (this.options.data) {
       this.data = this.options.data;
+    } else {
+      this.data = this.defaultValue as TDataResult;
     }
     this.getAll = this.getAll.bind(this);
     this.get = this.get.bind(this);
@@ -62,7 +61,7 @@ class BaseDataSource<T, Z = T[]> {
     this.validate = this.validate.bind(this);
     this.subscribe = this.subscribe.bind(this);
     this.notifySubscribers = this.notifySubscribers.bind(this);
-    this.#validateYupSchema = this.#validateYupSchema.bind(this);
+    this.validateYupSchema = this.validateYupSchema.bind(this);
     this.setDefaultValue();
   }
 
@@ -73,28 +72,28 @@ class BaseDataSource<T, Z = T[]> {
   setDefaultValue = () => {
     switch (this.options.targetMode) {
       case 'collection':
-        this.defaultValue = [];
+        this.defaultValue = [] as TDataResult;
         break;
       case 'document':
-        this.defaultValue = {};
+        this.defaultValue = {} as TDataResult;
         break;
       case 'string':
-        this.defaultValue = '';
+        this.defaultValue = '' as TDataResult;
         break;
       case 'number':
-        this.defaultValue = 0;
+        this.defaultValue = 0 as TDataResult;
         break;
       case 'boolean':
-        this.defaultValue = false;
+        this.defaultValue = false as TDataResult;
         break;
     }
   };
 
   // TODO: implement method overloading, T or partial T
-  #validateYupSchema = async (
-    data: Partial<T>,
+  async validateYupSchema(
+    data: Partial<TData>,
     options?: validateOptions
-  ): Promise<ValidationResult> => {
+  ): Promise<ValidationResult> {
     const combinedOptions = { full: false, abortEarly: false, ...options };
     const returnObject: ValidationResult = {
       valid: true,
@@ -135,61 +134,21 @@ class BaseDataSource<T, Z = T[]> {
       }
     }
     return returnObject;
-  };
+  }
 
-  validate = async (data: Partial<T>, options?: validateOptions): Promise<ValidationResult> => {
+  validate = async (data: Partial<TData>, options?: validateOptions): Promise<ValidationResult> => {
     //await this.#validateSchema(data, options);
-    return await this.#validateYupSchema(data, options);
+    return await this.validateYupSchema(data, options);
   };
 
-  // // TODO: finish implementation OR go to converters
-  // cleanValues = (data: Partial<T>): Partial<T> => {
-  //   const isObject = ['collection', 'document'].includes(this.options.targetMode || '');
-  //   const cleanedData: any = isObject ? {} : data;
-  //   if (isObject) {
-  //     for (const [key, value] of Object.entries(data)) {
-  //       if (value !== undefined || !this.options.cleanValues?.removeUndefined) {
-  //         cleanedData[key] = value;
-  //       }
-  //     }
-  //   }
-  //   return cleanedData;
-  // };
-
-  // protected _getDefaultValue = (): any => {
-  //   let fallback;
-
-  //   switch (this.options.targetMode) {
-  //     case 'collection':
-  //       fallback = [];
-  //       break;
-  //     case 'document':
-  //       fallback = {};
-  //       break;
-  //     case 'string':
-  //       fallback = '';
-  //       break;
-  //     case 'number':
-  //       fallback = 0;
-  //       break;
-  //     case 'boolean':
-  //       fallback = false;
-  //       break;
-  //     default:
-  //       fallback = null;
-  //       break;
-  //   }
-  //   return this.options.defaultValue || fallback;
-  // };
-
-  _applyPostFilters = (data: T[], filterConfig: FilterObject<T>): Partial<T>[] => {
+  _applyPostFilters = (data: TData[], filterConfig: FilterObject<TData>): Partial<TData>[] => {
     let result = data;
-    const { limit, orderBy, pagination, filters, select } = filterConfig;
+    const { limit, orderBy, pagination, filters } = filterConfig;
 
     if (filters) {
       result = result.filter((item) => {
         return Object.entries(filters!).every(([_key, value]) => {
-          const itemValue = item[value.field as keyof T];
+          const itemValue = item[value.field as keyof TData];
           const filterValue = typeof value.value === 'function' ? value.value() : value.value;
           return itemValue === filterValue;
         });
@@ -217,16 +176,6 @@ class BaseDataSource<T, Z = T[]> {
       result = result.slice(0, limit);
     }
 
-    if (select) {
-      // result = result.map((item) => {
-      //   const selectedItem: Partial<T> = {};
-      //   this.select!.forEach((key) => {
-      //     selectedItem[key] = item[key];
-      //   });
-      //   return selectedItem;
-      // });
-    }
-
     return result;
   }; // TODO: apply source filters vs apply class filters
 
@@ -234,10 +183,10 @@ class BaseDataSource<T, Z = T[]> {
     throw new Error("Method '_parseFilters' is not implemented.");
   };
 
-  prepareSave = (data: T): any => {
+  prepareSave = (data: TData): any => {
     // Check if ID exists
-    if (!data[this.options.idField as keyof T] && this.options.idField) {
-      data[this.options.idField] = this.generateNanoId() as unknown as T[keyof T];
+    if (!data[this.options.idField as keyof TData] && this.options.idField) {
+      data[this.options.idField] = this.generateNanoId() as unknown as TData[keyof TData];
     }
     // Set dates
     if (this.options.timestamps) {
@@ -259,16 +208,16 @@ class BaseDataSource<T, Z = T[]> {
     return data;
   };
 
-  async get(id?: string): Promise<T | null> {
+  async get(id?: string): Promise<TData | null> {
     if (!this.data && this.provider === 'Base') {
       throw new Error('No data found');
     } else if (this.options.targetMode === 'collection' && !id) {
       throw new Error('get() requires an ID when using collections');
     } else if (this.provider === 'Base') {
       if (this.options.targetMode === 'document') {
-        return this.converter.fromDatabase(this.data) as T;
+        return this.converter.fromDatabase(this.data) as TData;
       } else {
-        const data = (this.data as T[]).find((item: any) => item[this.options.idField] === id);
+        const data = (this.data as TData[]).find((item: any) => item[this.options.idField] === id);
         return data ? this.converter.fromDatabase(data) : null;
         // return (this.data as T[]).find((item: any) => item[this.options.idField] === id) || null;
       }
@@ -276,18 +225,25 @@ class BaseDataSource<T, Z = T[]> {
     return null;
   }
 
-  async getAll(_filter?: FilterObject<T>): Promise<T[]> {
+  async getAll(_filter?: FilterObject<TData>): Promise<TData[]> {
     if (!this.data && this.provider === 'Base') {
       throw new Error('No data found');
     } else if (this.options.targetMode === 'document') {
       throw new Error('getAll() can only be used with collections');
     } else if (this.provider === 'Base') {
-      return (this.data as T[]).map((item: any) => this.converter.fromDatabase(item)) as T[];
+      return (this.data as TData[]).map((item: any) =>
+        this.converter.fromDatabase(item)
+      ) as TData[];
     }
     return [];
   }
 
-  async add(item: T): Promise<any> {
+  async fetchData(_filter?: FilterObject<TData>): Promise<TData[] | TData | null> {
+    if (this.options.targetMode === 'collection') return this.getAll(_filter);
+    return this.get();
+  }
+
+  async add(item: TData): Promise<any> {
     if (!this.data && this.provider === 'Base') {
       throw new Error('No data found');
     } else if (this.options.targetMode !== 'collection') {
@@ -309,18 +265,21 @@ class BaseDataSource<T, Z = T[]> {
       if (!data[this.options.idField]) {
         data[this.options.idField] = this.generateNanoId();
       }
-      (this.data as T[]).push(data);
-      this.notifySubscribers(this.data as Z);
+      (this.data as TData[]).push(data);
+      this.notifySubscribers(this.data as TDataResult);
     }
 
     return item;
   }
 
-  async update(data: Partial<T>, id?: string): Promise<any> {
+  async update(data: Partial<TData>): Promise<any> {
+    const id = data[this.options.idField as keyof TData] as string;
     if (!this.data && this.provider === 'Base') {
       throw new Error('No data found');
     } else if (this.options.targetMode === 'collection' && !id) {
-      throw new Error('id must be provided when using collections');
+      throw new Error(
+        `id must be provided when using collections. ID field: ${this.options.idField as string}`
+      );
     }
 
     // Validate new data
@@ -330,11 +289,11 @@ class BaseDataSource<T, Z = T[]> {
     }
 
     // Prepare data
-    data = this.prepareSave(data as T);
+    data = this.prepareSave(data as TData);
 
     // Update data to baseprovider
     if (this.provider === 'Base') {
-      const saveData = this.converter.toDatabase(data as T);
+      const saveData = this.converter.toDatabase(data as TData);
       if (this.options.targetMode === 'document') {
         this.data = {
           ...this.data,
@@ -351,15 +310,18 @@ class BaseDataSource<T, Z = T[]> {
           }
         }
       }
-      this.notifySubscribers(this.data as Z);
+      this.notifySubscribers(this.data as TDataResult);
     }
   }
 
-  async set(data: T, id?: string): Promise<any> {
+  async set(data: TData): Promise<any> {
+    const id = data[this.options.idField as keyof TData] as string;
     if (!this.data && this.provider === 'Base') {
       throw new Error('No data found');
     } else if (this.options.targetMode === 'collection' && !id) {
-      throw new Error('id must be provided when using collections');
+      throw new Error(
+        `id must be provided when using collections. ID field: ${this.options.idField as string}`
+      );
     }
 
     // Validate new data
@@ -373,7 +335,7 @@ class BaseDataSource<T, Z = T[]> {
 
     // Update data to baseprovider
     if (this.provider === 'Base') {
-      const saveData = this.converter.toDatabase(data as T);
+      const saveData = this.converter.toDatabase(data as TData);
       if (this.options.targetMode === 'document') {
         this.data = saveData;
       } else {
@@ -384,11 +346,11 @@ class BaseDataSource<T, Z = T[]> {
           }
         }
       }
-      this.notifySubscribers(this.data as Z);
+      this.notifySubscribers(this.data as TDataResult);
     }
   }
 
-  subscribe(callback: (data: T | null) => void): () => void {
+  subscribe(callback: (data: TData | null) => void): () => void {
     if (!this.data && this.provider === 'Base') {
       throw new Error('No data found');
     }
@@ -396,7 +358,7 @@ class BaseDataSource<T, Z = T[]> {
     this.subscribers.push(callback);
 
     // Call the callback immediately with the current data
-    callback(this.data as T | null);
+    callback(this.data as TData | null);
 
     // Return an unsubscribe function
     return () => {
@@ -404,8 +366,8 @@ class BaseDataSource<T, Z = T[]> {
     };
   }
 
-  private notifySubscribers = (data: Z) => {
-    this.subscribers.forEach((callback) => callback(data as T | null));
+  public notifySubscribers = (data: TDataResult) => {
+    this.subscribers.forEach((callback) => callback(data as TData | null));
   };
 
   async delete(id?: string): Promise<void> {
@@ -415,13 +377,15 @@ class BaseDataSource<T, Z = T[]> {
       throw new Error('id must be provided when using collections');
     } else if (this.provider === 'Base') {
       if (this.options.targetMode === 'document') {
-        this.data = undefined;
+        this.data = this.defaultValue as TDataResult;
       } else {
         if (Array.isArray(this.data)) {
-          this.data = (this.data as T[]).filter((item: any) => item[this.options.idField] !== id);
+          this.data = this.data.filter(
+            (item: any) => item[this.options.idField] !== id
+          ) as TDataResult;
         }
       }
-      this.notifySubscribers(this.data as Z);
+      this.notifySubscribers(this.data as TDataResult);
     }
   }
 }

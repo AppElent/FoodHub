@@ -1,19 +1,18 @@
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import i18next from 'i18next';
 import { showTranslations } from 'translation-check';
-import DefaultPage from '../DefaultPage';
 
-const Translations = () => {
+const TranslationTestPage = () => {
   return (
-    <DefaultPage>
+    <Box>
       <Button
         variant="contained"
         onClick={() => showTranslations(i18next)}
       >
         Show translations
       </Button>
-    </DefaultPage>
+    </Box>
   );
 };
 
-export default Translations;
+export default TranslationTestPage;

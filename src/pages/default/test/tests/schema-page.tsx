@@ -1,15 +1,16 @@
 import JsonEditor from '@/components/default/json-editor';
-import { createDummySchema } from '@/schemas/dummy';
-import DefaultPage from '../DefaultPage';
+import { createDummySchema } from '@/schemas/dummy/dummy';
+import { Box } from '@mui/material';
 
 const SchemaPage = () => {
   const schema = createDummySchema();
   const mockdata = schema.generateMockData();
   console.log(schema.getTemplate());
+  console.log(schema.schema, schema.schema.describe());
   return (
-    <DefaultPage>
+    <Box>
       <JsonEditor data={mockdata} />
-    </DefaultPage>
+    </Box>
   );
 };
 

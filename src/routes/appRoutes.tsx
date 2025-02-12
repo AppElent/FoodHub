@@ -1,8 +1,6 @@
-import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import Account from '@/pages/default/account';
-import FileUploads from '@/pages/default/test/file-uploads';
 
 import { CustomRouteObject } from '@/config/routing';
 import PeopleIcon from '@mui/icons-material/People';
@@ -29,71 +27,22 @@ const appRoutes: CustomRouteObject[] = [
     element: <div>Profile</div>,
   },
   {
-    id: 'testPages',
-    label: 'Test pages',
-    Icon: <QuizIcon />,
-    path: 'test',
-    element: (
-      <Suspense>
-        <Outlet />
-      </Suspense>
-    ),
+    id: 'tests',
+    label: 'Tests',
+    Icon: <QuizIcon fontSize="inherit" />,
+    category: import.meta.env.DEV ? 'settings' : undefined,
+    path: 'tests',
+    element: <Outlet />,
     children: [
-      { id: 'testPagesIndex', index: true, element: <div>Test pages</div> },
       {
-        id: 'testDataSources',
-        label: 'Data sources',
-        Icon: <QuizIcon />,
-        category: 'test',
-        path: 'data-sources',
-        // element: <DataSources />,
+        id: 'testsIndex',
+        index: true,
       },
       {
-        id: 'testFileUploads',
-        label: 'File uploads',
+        id: 'testsDetail',
+        label: 'Test detail',
         Icon: <QuizIcon />,
-        category: 'test',
-        path: 'file-uploads',
-        element: <FileUploads />,
-      },
-      {
-        id: 'testAuthProviders',
-        label: 'Auth providers',
-        Icon: <QuizIcon />,
-        category: 'test',
-        path: 'auth-providers',
-        // element: <TestAuthProviders />,
-      },
-      {
-        id: 'testForms',
-        label: 'Forms',
-        Icon: <QuizIcon />,
-        category: 'test',
-        path: 'forms',
-        // element: <Forms />,
-      },
-      {
-        id: 'testTranslations',
-        label: 'Translations',
-        Icon: <QuizIcon />,
-        category: 'test',
-        path: 'translations',
-        // element: <Translations />,
-      },
-
-      {
-        id: 'testFilters',
-        label: 'Filters',
-        Icon: <QuizIcon />,
-        category: 'test',
-        path: 'filters',
-      },
-      {
-        id: 'testSchemas',
-        label: 'Schemas',
-        Icon: <QuizIcon />,
-        category: 'test',
-        path: 'schemas',
+        path: ':testId',
       },
     ],
   },

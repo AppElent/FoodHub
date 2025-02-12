@@ -1,9 +1,8 @@
 import useAuth from '@/libs/auth/use-auth';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
-import DefaultPage from '@/pages/default/DefaultPage';
-import ImageUploaderCard from '@/pages/default/test/file-uploads/_components/image-uploader-card';
-import SimpleCropper from '@/pages/default/test/file-uploads/_components/simple-cropper';
-import { Card, CardContent, CardHeader, Grid } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, Grid } from '@mui/material';
+import ImageUploaderCard from './_components/image-uploader-card';
+import SimpleCropper from './_components/simple-cropper';
 
 interface CardLayoutProps {
   title: string;
@@ -19,12 +18,12 @@ const CardLayout = ({ title, children }: CardLayoutProps) => {
   );
 };
 
-const FileUploads = () => {
+const FileUploadsTestPage = () => {
   const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
   const auth = useAuth();
 
   return (
-    <DefaultPage>
+    <Box>
       <Grid
         container
         spacing={3}
@@ -55,8 +54,8 @@ const FileUploads = () => {
           </CardLayout>
         </Grid>
       </Grid>
-    </DefaultPage>
+    </Box>
   );
 };
 
-export default FileUploads;
+export default FileUploadsTestPage;

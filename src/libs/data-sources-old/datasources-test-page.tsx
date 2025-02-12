@@ -1,13 +1,12 @@
 import JsonEditor from '@/components/default/json-editor';
 import { db } from '@/config/firebase';
-import BaseDataSource from '@/libs/data-sources/data-sources/BaseDataSource';
-import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
-import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
-import useData from '@/libs/data-sources/useData';
 import Tabs from '@/libs/tabs';
-import { createDummySchema, Dummy, dummyYupSchema } from '@/schemas/dummy';
-import { Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
-import DefaultPage from '../../DefaultPage';
+import { createDummySchema, Dummy, dummyYupSchema } from '@/schemas/dummy/dummy';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
+import BaseDataSource from './data-sources/BaseDataSource';
+import FirestoreDataSource from './data-sources/FirestoreDataSource';
+import LocalStorageDataSource from './data-sources/LocalStorageDataSource';
+import useData from './useData';
 
 const datasources = {
   Firestore: {
@@ -210,16 +209,16 @@ const DataSourceTab = ({ tab: currentTab }: { tab: string }) => {
   );
 };
 
-const DataOperations = () => {
+const DataSourcesTestPage = () => {
   const tabsData = Object.keys(datasources).map((key) => {
     const component = <DataSourceTab tab={key} />;
     return { label: key, value: key, component };
   });
   return (
-    <DefaultPage>
+    <Box>
       <Tabs tabs={tabsData} />
-    </DefaultPage>
+    </Box>
   );
 };
 
-export default DataOperations;
+export default DataSourcesTestPage;

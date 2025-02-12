@@ -56,7 +56,6 @@ const ListItem = ({ name, index, remove, ...props }: CustomListItemProps) => {
           fullWidth
           // margin="dense"
           {...field}
-          {...props}
           value={field.value || ''}
           error={meta.touched && Boolean(meta.error)}
           helperText={meta.touched && meta.error}
@@ -86,7 +85,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
     throw new Error('Either name or field must be provided');
   }
   const fieldName = name || fieldConfig?.name;
-  const data = useFormField(fieldName as string);
+  const data = useFormField(fieldName as string, fieldConfig);
   const { options, field, helpers } = data;
 
   const newProps = _.merge({}, options, props);
@@ -105,7 +104,6 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
 
     helpers.setValue(items);
   };
-
   return (
     <FieldArray name={fieldName as string}>
       {({ remove, push }) => (
@@ -134,7 +132,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
                   >
                     <MUIList
                       dense
-                      {...newProps}
+                      {...newProps.muiListProps}
                     >
                       {field.value?.map((_item: any, index: number) => (
                         <Draggable

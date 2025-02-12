@@ -1,7 +1,7 @@
 import DefaultPage from '@/pages/default/DefaultPage';
 
-const Cheese = () => {
-  return <DefaultPage>Cheese</DefaultPage>;
+const CheeseHomePage = () => {
+  return <DefaultPage>Under construction</DefaultPage>;
 };
 
-export default Cheese;
+export default CheeseHomePage;

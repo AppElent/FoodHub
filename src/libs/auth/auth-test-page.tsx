@@ -1,8 +1,16 @@
 import config from '@/config';
 import FirebaseAuthProvider from '@/libs/auth/auth-providers/FirebaseAuthProvider';
 import useLoginForm from '@/libs/auth/use-login-form';
-import { Button, Card, CardActions, CardContent, CardHeader, Grid, TextField } from '@mui/material';
-import DefaultPage from '../../DefaultPage';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Grid,
+  TextField,
+} from '@mui/material';
 
 const authProviders: { [key: string]: any } = {
   Firebase: new FirebaseAuthProvider({
@@ -56,9 +64,9 @@ const AuthProvider = (props: { providerName: string }) => {
   );
 };
 
-const TestAuthProviders = () => {
+const AuthTestPage = () => {
   return (
-    <DefaultPage>
+    <Box>
       <Grid
         container
         spacing={3}
@@ -77,8 +85,8 @@ const TestAuthProviders = () => {
             );
           })}
       </Grid>
-    </DefaultPage>
+    </Box>
   );
 };
 
-export default TestAuthProviders;
+export default AuthTestPage;

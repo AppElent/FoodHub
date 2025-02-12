@@ -1,4 +1,8 @@
 {
+  "defaults": {
+    "recipe_one": "Recept",
+    "recipe_other": "Recepten"
+  },
   "data": {
     "RECIPE_KEYWORDS": [
       "snel",
@@ -20,26 +24,22 @@
   },
   "schemas": {
     "recipe": {
-      "name": "Naam",
-      "description": "Beschrijving",
-      "time": {
-        "prep": "Voorbereiding",
-        "cook": "Kooktijd",
-        "total": "Totaal"
-      },
-      "yields": {
-        "quantity": "Hoeveelheid",
-        "unit": "Eenheid"
-      },
-      "nutrients": {
-        "value": "Voedingswaarden",
-        "calories": "Calorieën",
-        "fat": "Vet",
-        "sugar": "Suiker",
-        "protein": "Eiwit",
-        "fiber": "Vezel",
-        "carbs": "Koolhydraten"
-      },
+      "name": "$t(common:fields.name)",
+      "description": "$t(common:fields.description)",
+      "time": "Tijd",
+      "prep": "Voorbereiding",
+      "cooking": "Kooktijd",
+      "total": "Totaal",
+      "yields": "Portie",
+      "quantity": "Hoeveelheid",
+      "unit": "Eenheid",
+      "nutrients": "Voedingswaarden",
+      "calories": "Calorieën",
+      "fat": "Vet",
+      "sugar": "Suiker",
+      "protein": "Eiwit",
+      "fiber": "Vezel",
+      "carbs": "Koolhydraten",
       "image": "Afbeelding",
       "images": "Afbeeldingen",
       "ingredients": "Ingrediënten",
@@ -52,6 +52,21 @@
       "cuisine": "Keuken",
       "createdAt": "Datum Gepubliceerd",
       "updatedAt": "Datum Gewijzigd"
+    },
+    "foodtracker": {
+      "foodtracker": "Voedseltracker"
+    },
+    "favorites": {
+      "favorites": "Favorieten",
+      "wine": {
+        "wine": "Wijn"
+      },
+      "beer": {
+        "beer": "Bier"
+      },
+      "cheese": {
+        "cheese": "Kaas"
+      }
     }
   },
   "pages": {
@@ -72,8 +87,5 @@
     "myRecipes": "Mijn recepten",
     "foodtracker": "Voedseltracker",
     "favorites": "Favorieten"
-  },
-  "defaults": {
-    "recipe": "Recept"
   }
 }

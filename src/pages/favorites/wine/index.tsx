@@ -1,7 +1,7 @@
 import DefaultPage from '@/pages/default/DefaultPage';
 
-const Wine = () => {
-  return <DefaultPage>Wine</DefaultPage>;
+const WineHomePage = () => {
+  return <DefaultPage>Under construction</DefaultPage>;
 };
 
-export default Wine;
+export default WineHomePage;

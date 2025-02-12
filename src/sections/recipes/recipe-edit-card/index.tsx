@@ -45,7 +45,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
     setItem: setRecipe,
     updateItem: updateRecipe,
     deleteItem: deleteRecipe,
-  } = useDataHelper<Recipe>('recipes', { label: t('foodhub:defaults.recipe') });
+  } = useDataHelper<Recipe>('recipes', { label: t('foodhub:defaults.recipe', { count: 1 }) });
   // Loading external data state
   const [externalDataAction, setExternalDataAction] = useState<externalDataActionInterface>({
     loading: false,
@@ -146,7 +146,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
         }
       }
     },
-    [externalDataAction.error, formik]
+    [externalDataAction.error, formik, t]
   );
 
   // Receive url query param and fetch recipe data
@@ -188,7 +188,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
   };
 
   // Get fields and suggestions
-  const fields = useMemo(() => createRecipeSchema().getFieldDefinitions(), []);
+  const fields = useMemo(() => createRecipeSchema({ t }).getFieldDefinitions(), [t]);
   const keywordSuggestions = useMemo(
     () => recipes && createRecipeSchema().getKeywordsSuggestions(recipes),
     [recipes]
@@ -320,134 +320,7 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
               },
             }}
           />
-          {/* <ImageUploaderCard
-            imageUrls={formik.values.image}
-            onUpload={async (files) => {
-              await saveImages(files);
-            }}
-          /> */}
 
-          {/* <ImageCards
-            imageUrls={formik.values.images}
-            onSave={async (files) => {
-              await saveImages(files);
-            }}
-            showUploadButton={false}
-            size={{
-              width: 150,
-              height: 100,
-            }}
-            crop={{
-              action: async (file: File) => {
-                await saveImages([file]);
-              },
-            }}
-            remove={{
-              action: async (url: string) => {
-                const newImages = formik.values.images.filter((img: string) => img !== url);
-                if (url.startsWith('blob:')) {
-                  URL.revokeObjectURL(url);
-
-                  if (recipe) {
-                    updateRecipe(
-                      {
-                        images: newImages,
-                      },
-                      recipe.id
-                    );
-                  } else {
-                    formik.setFieldValue('images', newImages);
-                  }
-                  // formik.setFieldValue('image', '');
-                } else if (url.startsWith('https://firebasestorage.googleapis.com')) {
-                  try {
-                    const storageClass = new FirebaseStorageProvider();
-                    await storageClass.deleteFile(url);
-                  } catch (e) {
-                    console.error(e);
-                  }
-                  if (recipe) {
-                    updateRecipe(
-                      {
-                        images: newImages,
-                      },
-                      recipe.id
-                    );
-                  } else {
-                    formik.setFieldValue('images', newImages);
-                  }
-                }
-              },
-            }}
-            favorite={{
-              action: async (url: string) => {
-                if (recipe && recipe.image !== url) {
-                  updateRecipe(
-                    {
-                      image: url,
-                      images:
-                        recipe.image && recipe.image !== ''
-                          ? [...recipe.images, recipe.image]
-                          : recipe.images,
-                    },
-                    recipe.id
-                  );
-                } else if (formik.values.image !== url) {
-                  const newImages = formik.values.image
-                    ? [...formik.values.images, formik.values.image]
-                    : formik.values.images;
-                  formik.setFieldValue('image', url);
-                  formik.setFieldValue('images', newImages);
-                }
-              },
-              isFavorite: (url: string) => {
-                return formik.values.image === url;
-              },
-            }}
-          /> */}
-          {/* <ImageCard
-            imageUrl={recipe ? recipe.image : formik.values.image}
-            onSave={async (file) => {
-              console.log('Saving file ' + file.name);
-              await saveImage(file);
-            }}
-            crop={{
-              action: async (file: File) => {
-                await saveImage(file);
-              },
-            }}
-            remove={{
-              action: async (url: string) => {
-                if (url.startsWith('blob:')) {
-                  URL.revokeObjectURL(url);
-                  if (recipe) {
-                    updateRecipe(
-                      {
-                        image: '',
-                      },
-                      recipe.id
-                    );
-                  } else {
-                    formik.setFieldValue('image', '');
-                  }
-                  // formik.setFieldValue('image', '');
-                } else if (url.startsWith('https://firebasestorage.googleapis.com')) {
-                  const storageClass = new FirebaseStorageProvider();
-                  await storageClass.deleteFile(url);
-                  if (recipe) {
-                    updateRecipe(
-                      {
-                        image: '',
-                      },
-                      recipe.id
-                    );
-                  } else {
-                    formik.setFieldValue('image', '');
-                  }
-                }
-              },
-            }}
-          /> */}
           <TextField field={fields.name} />
           <Rating
             field={fields.score}
@@ -465,7 +338,6 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
               sm={formik?.values.url ? 8 : 12}
             >
               <Box>
-                {/* TODO: If url is invalid, save continues */}
                 <TextField field={fields.url} />
               </Box>
             </Grid>
@@ -522,32 +394,6 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
           <TextField field={fields.yieldsText} />
           <TextField field={fields['nutrients.calories']} />
 
-          {/* <Images
-            field={fields.images}
-            uploadImage={async (file) => {
-              const storageClass = new FirebaseStorageProvider();
-              const url = await storageClass.uploadFile(
-                file,
-                `uploads/recipes/${recipe?.id}/${file.name}`
-              );
-              return url;
-            }}
-            // TODO: action array
-            deleteImage={async (url) => {
-              const storageClass = new FirebaseStorageProvider();
-              await storageClass.deleteFile(url);
-            }}
-            getFavorite={(url) => {
-              return formik.values.image === url;
-            }}
-            setFavorite={(url) => {
-              formik.setFieldValue('image', url);
-            }}
-            cropImage={async (_url: string) => {
-              return '';
-            }}
-          /> */}
-
           <Errors fields={fields} />
 
           {getLogLevel() === 'debug' && (
@@ -570,11 +416,13 @@ const RecipeEditCard = ({ recipe }: RecipeEditCardProps) => {
                 variant="outlined"
                 color="error"
               >
-                {t('common.actions.delete')}{' '}
+                {t('common:actions.delete')}{' '}
               </Button>
             )}
-            <CancelButton onClick={() => router.push('myRecipes')}>Cancel</CancelButton>
-            <SubmitButton>Save</SubmitButton>
+            <CancelButton onClick={() => router.push('myRecipes')}>
+              {t('common:actions.cancel')}
+            </CancelButton>
+            <SubmitButton>{t('common:actions.save')}</SubmitButton>
           </CardActions>
         </CustomForm>
       )}

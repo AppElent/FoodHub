@@ -16,10 +16,12 @@ interface ValidationResult<T> {
 
 export interface DefaultSchemaProps {
   customFieldDefinitions?: { [key: string]: Partial<FieldConfig> };
+  translate?: (key: string) => string | undefined;
 }
 
 export interface DefaultSchemaReturn<T> {
   schema: Yup.ObjectSchema<any>;
+  originalSchema: Yup.ObjectSchema<any>;
   // getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> };
   generateMockData: (yupSchema?: YupSchema<any>) => T;
   getMockData: (count: number) => T[];
@@ -43,6 +45,7 @@ export const createDefaultSchema = <T>(
   yupSchema: Yup.ObjectSchema<any>,
   options: DefaultSchemaProps = {}
 ): DefaultSchemaReturn<T> => {
+  // const schema = createYupSchemaGenerator({ yupSchema, translate: options.translate }).generate();
   const schema = yupSchema;
   const mockDataGenerator = createMockDataGenerator<T>(yupSchema);
 
@@ -57,6 +60,7 @@ export const createDefaultSchema = <T>(
 
   return {
     schema,
+    originalSchema: yupSchema,
     generateMockData: mockDataGenerator.generateMockData,
     getMockData: (count: number) => mockDataGenerator.getMockData(count) as unknown as T[],
     // generateTestData: () => generateTestData(schema),
@@ -85,7 +89,7 @@ export const createDefaultSchema = <T>(
       // Return all non undefined values
       return Object.keys(defaultValues).reduce((acc: any, key) => {
         if (defaultValues[key] !== undefined) {
-          acc[key as keyof T] = defaultValues[key as keyof T];
+          acc[key as keyof T] = (defaultValues as T)[key as keyof T];
         }
         return acc;
       }, {});
@@ -103,13 +107,16 @@ export const createDefaultSchema = <T>(
           const newKey = basePath ? `${basePath}.${key}` : key;
           const field = fields[key];
           const description = field.describe();
-          const label = 'label' in description ? description.label : key;
+          //const label = 'label' in description ? description.label : key;
+          const originalLabel =
+            'label' in description && description.label !== undefined ? description.label : key;
+          const newLabel = options.translate?.(key) || originalLabel;
           const defaultValue = 'default' in description ? description.default : undefined;
           const meta = 'meta' in description ? description.meta : {};
           const newField: FieldConfig = {
             name: newKey,
             id: key,
-            label,
+            label: newLabel,
             type: description.type,
             default: defaultValue,
             ...meta,

@@ -1,11 +1,7 @@
 import ScrollToTop from '@/components/default/scroll-to-top';
 import '@/config/firebase';
-import { db } from '@/config/firebase';
 import routes from '@/config/routes';
-import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
-import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
 
-import { Recipe, recipeYupSchema } from '@/schemas/recipes/recipe';
 import theme from '@/theme/paperbase/theme';
 import './App.css';
 import config from './config';
@@ -18,27 +14,8 @@ const firebaseProvider = new FirebaseAuthProvider({
   logout: '/logout',
 });
 
-const devFilter = import.meta.env.DEV ? 'ja' : 'ZMG16rhpzbdKd8LXUIiNOD7Jul23';
-
-const dataSources = {
-  recipes: new FirestoreDataSource<Recipe>(
-    {
-      target: 'recipes',
-      targetMode: 'collection',
-      YupValidationSchema: recipeYupSchema,
-      subscribe: true,
-      targetFilter: {
-        filters: [{ field: 'owner', operator: '!=', value: devFilter }],
-        orderBy: [{ field: 'name', direction: 'asc' }],
-      },
-    },
-    { db }
-  ),
-  settings: new LocalStorageDataSource({ target: 'settings', targetMode: 'document' }),
-};
-
 function App() {
-  console.log('App config', firebaseProvider, dataSources, routes, config);
+  console.log('App config', firebaseProvider, routes, config);
   return (
     <>
       <ScrollToTop />
@@ -47,7 +24,6 @@ function App() {
         theme={theme}
         authProvider={firebaseProvider}
         routes={routes}
-        dataSources={dataSources}
       />
     </>
   );

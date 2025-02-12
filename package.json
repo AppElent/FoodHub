@@ -1,7 +1,7 @@
 {
   "name": "foodhub",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -20,6 +20,8 @@
     "deploy:prd:skipchecks": "npm run build && firebase deploy --only hosting:prd",
     "deploy:prd:skipbuild": "firebase deploy --only hosting:prd",
     "deploy": "npm run deploy:stg && npm run deploy:prd:skipbuild",
+    "deploy:version": "npm run update-version && npm run deploy",
+    "update-version": "node update-version.js",
     "check-updates": "npx npm-check-updates -i",
     "docs": "jsdoc -c jsdoc.conf.json",
     "npm-check": "npm-check"
@@ -31,6 +33,8 @@
     "@microlink/react-json-view": "^1.24.0",
     "@mui/icons-material": "^6.4.1",
     "@mui/material": "^6.4.1",
+    "@tanstack/react-query": "^5.66.0",
+    "@tanstack/react-query-devtools": "^5.66.0",
     "firebase": "^11.2.0",
     "formik": "^2.4.6",
     "i18next": "^24.2.2",
@@ -63,6 +67,7 @@
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
+    "prompt-sync-plus": "^1.0.2",
     "typescript": "~5.7.3",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.0.11"

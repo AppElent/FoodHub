@@ -1,5 +1,5 @@
-import { useData } from '@/libs/data-sources';
-import { UseDataPropsOptions } from '@/libs/data-sources/useData';
+import { useData } from '@/libs/data-sources-old';
+import { UseDataPropsOptions } from '@/libs/data-sources-old/useData';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';

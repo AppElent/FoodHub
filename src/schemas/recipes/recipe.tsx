@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import InputAdornment from '@mui/material/InputAdornment';
+import i18next from 'i18next';
 import * as Yup from 'yup';
 import { createDefaultSchema } from '..';
 import { ExternalRecipe } from './external-recipe';
@@ -29,18 +30,10 @@ export const recipeYupSchema = Yup.object().shape({
     .optional()
     .default(() => faker.string.nanoid())
     .label('ID'),
-  owner: Yup.string().required('Owner is required').label('Owner'),
-  name: Yup.string()
-    .required()
-    .min(3)
-    .default('')
-    .label('Name')
-    .meta({ default: '', translationKey: 'foodhub:schemas.recipe.name' }),
-  description: Yup.string()
-    .optional()
-    .default('')
-    .label('Description')
-    .meta({ default: '', translationKey: 'foodhub:schemas.recipe.description' }),
+  owner: Yup.string().required().label('Owner'),
+  name: Yup.string().required().min(3).default('').label('Name'),
+  // .meta({ default: '', translationKey: 'foodhub:schemas.recipe.name' }),
+  description: Yup.string().optional().default('').label('Description'),
   time: recipeYupTimeSchema.default(() => recipeYupTimeSchema.getDefault()).label('Time'),
   yields: recipeYupYieldsSchema.default(() => recipeYupYieldsSchema.getDefault()).label('Yields'),
   yieldsText: Yup.string().optional().default('').optional().label('Yields'),
@@ -49,6 +42,7 @@ export const recipeYupSchema = Yup.object().shape({
     .default(() => recipeYupNutrientsSchema.getDefault())
     .label('Nutrients info'),
   image: Yup.string().optional().default('').label('Image'),
+  // .meta({ translationKey: 'common:labels.image' }),
   images: Yup.array().of(Yup.string()).optional().default([]).label('Images'),
   ingredients: Yup.array().of(Yup.string()).optional().default(['']).label('Ingredients'),
   instructions: Yup.array().of(Yup.string()).optional().default(['']).label('Instructions'),
@@ -56,16 +50,8 @@ export const recipeYupSchema = Yup.object().shape({
   score: Yup.number().optional().default(0).label('Score').nullable(),
   url: Yup.string().url().optional().default('').label('URL'),
   category: Yup.string().optional().default('').label('Category'),
-  keywords: Yup.array()
-    .of(Yup.string().min(2, 'Min 2 characters'))
-    .optional()
-    .default([])
-    .label('Keywords'),
-  cuisine: Yup.array()
-    .of(Yup.string().min(2, 'Min 2 characters'))
-    .optional()
-    .default([])
-    .label('Cuisine'),
+  keywords: Yup.array().of(Yup.string().min(2)).optional().default([]).label('Keywords'),
+  cuisine: Yup.array().of(Yup.string().min(2)).optional().default([]).label('Cuisine'),
   createdAt: Yup.string()
     .optional()
     .default(() => new Date().toISOString())
@@ -80,7 +66,11 @@ export const recipeYupSchema = Yup.object().shape({
 
 export type Recipe = Yup.InferType<typeof recipeYupSchema>;
 
-export const createRecipeSchema = () => {
+interface createRecipeSchemaProps {
+  t?: typeof i18next.t;
+}
+
+export const createRecipeSchema = ({ t }: createRecipeSchemaProps = {}) => {
   const customFieldDefinitions = {
     instructions: {
       custom: {
@@ -123,7 +113,11 @@ export const createRecipeSchema = () => {
       },
     },
   };
-  const defaultSchema = createDefaultSchema<Recipe>(recipeYupSchema, { customFieldDefinitions });
+  const translate = (key: string) => (t ? t(`foodhub:schemas.recipe.${key}`) : undefined);
+  const defaultSchema = createDefaultSchema<Recipe>(recipeYupSchema, {
+    customFieldDefinitions,
+    translate,
+  });
 
   const getKeywordsSuggestions = (recipes: Recipe[]) => {
     // Get all unique values from recipe keywords

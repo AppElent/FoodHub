@@ -1,7 +1,7 @@
 import DataTable from '@/components/default/data-table';
-import { createDummySchema, Dummy } from '@/schemas/dummy';
+import { createDummySchema, Dummy } from '@/schemas/dummy/dummy';
+import { Box } from '@mui/material';
 import { useMemo } from 'react';
-import DefaultPage from '../DefaultPage';
 
 const columns = [
   {
@@ -20,7 +20,7 @@ const FiltersPage = () => {
   const data = useMemo(() => createDummySchema().getMockData(20), []) as Dummy[];
 
   return (
-    <DefaultPage>
+    <Box>
       {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
       <DataTable
         columns={columns}
@@ -46,7 +46,7 @@ const FiltersPage = () => {
           </TableBody>
         </Table>
       </TableContainer> */}
-    </DefaultPage>
+    </Box>
   );
 };
 

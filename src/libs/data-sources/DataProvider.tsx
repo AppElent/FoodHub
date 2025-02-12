@@ -1,155 +1,49 @@
-import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
-import { DataSourceObject, FilterObject } from '.';
-import BaseDataSource from './data-sources/BaseDataSource';
+import React, { createContext, useCallback, useEffect, useState } from 'react';
+// import { DataSourceObject } from '.';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DataProviderContextProps {
-  dataSources: DataSourceObject;
-  setDataSource: (key: string, dataSource: BaseDataSource<any>) => void;
-  addDataSource: (key: string, dataSource: BaseDataSource<any>) => void;
   data: Record<string, any>;
-  loading: Record<string, boolean>;
-  error: Record<string, any>;
-  fetchData: (key: string, filter?: object) => Promise<void>;
-  subscribeToData: (key: string) => void;
+  subscribeToData: (hashedKey: string, key: unknown[]) => void;
   subscriptions: Record<string, () => void>;
-  add: (key: string, item: any) => Promise<any>;
-  update: (key: string, data: any, id?: string) => Promise<any>;
-  set: (key: string, data: any, id?: string) => Promise<any>;
-  remove: (key: string, id?: string) => Promise<void>;
-} // TODO: implement?
+}
 
 // Create a context for the data
 // eslint-disable-next-line react-refresh/only-export-components
 export const DataContext = createContext<DataProviderContextProps | undefined>(undefined);
 
-interface DataProviderProps {
-  dataSources: DataSourceObject;
-  children: ReactNode;
-}
-
-const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) => {
+const DataProvider: React.FC<any> = ({ dataSources, children }) => {
   const [data, setData] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState<Record<string, boolean>>({});
-  const [error, setError] = useState<Record<string, any>>({});
   const [subscriptions, setSubscriptions] = useState<Record<string, () => void>>({});
-  const [dataSourcesState, setDataSourcesState] = useState(dataSources);
-
-  const addDataSource = useCallback(
-    (key: string, newDataSource: BaseDataSource<any>) => {
-      setDataSourcesState((prev) => ({ ...prev, [key]: newDataSource }));
-    },
-    [setDataSourcesState]
-  );
-
-  const setDataSource = useCallback((key: string, dataSource: BaseDataSource<any>) => {
-    setDataSourcesState((prev) => ({ ...prev, [key]: dataSource }));
-  }, []);
+  const queryClient = useQueryClient();
 
   const getDataSource = useCallback(
     (key: string) => {
-      const dataSource = dataSourcesState[key];
+      const dataSource = dataSources[key]?.source;
       if (!dataSource) throw new Error(`Data source with key ${key} not found`);
       return dataSource;
     },
-    [dataSourcesState]
-  );
-
-  const fetchData = useCallback(
-    async (key: string, _filter?: FilterObject<any>) => {
-      if (subscriptions[key]) return; // Skip if there is an active subscription
-      setLoading((prev) => ({ ...prev, [key]: true }));
-      setError((prev) => ({ ...prev, [key]: null }));
-      try {
-        const dataSource = getDataSource(key);
-        const result =
-          dataSource.options?.targetMode === 'collection'
-            ? await dataSource.getAll() // TODO: add filter
-            : await dataSource.get();
-        setData((prev) => ({ ...prev, [key]: result }));
-      } catch (err) {
-        setError((prev) => ({ ...prev, [key]: err }));
-      } finally {
-        setLoading((prev) => ({ ...prev, [key]: false }));
-      }
-    },
-    [getDataSource, subscriptions]
+    [dataSources]
   );
 
   const subscribeToData = useCallback(
-    (key: string) => {
-      if (subscriptions[key]) {
-        subscriptions[key]();
+    (stringKey: string, key: readonly unknown[]) => {
+      if (subscriptions[stringKey]) {
+        subscriptions[stringKey]();
       }
 
       try {
-        const dataSource = getDataSource(key);
+        const dataSource = getDataSource(stringKey);
         const unsubscribe = dataSource.subscribe((newData: any) => {
-          setData((prev) => ({ ...prev, [key]: newData }));
-          setLoading((prev) => ({ ...prev, [key]: false }));
+          setData((prev) => ({ ...prev, [stringKey]: newData }));
+          queryClient.setQueryData(key, newData);
         });
-        setSubscriptions((prev) => ({ ...prev, [key]: unsubscribe }));
+        setSubscriptions((prev) => ({ ...prev, [stringKey]: unsubscribe }));
       } catch (err) {
-        setError((prev) => ({ ...prev, [key]: err }));
-        setLoading((prev) => ({ ...prev, [key]: false }));
+        console.error('Error subscribing to data', err);
       }
     },
-    [getDataSource, subscriptions]
-  );
-
-  const add = useCallback(
-    async (key: string, item: any) => {
-      const dataSource = getDataSource(key);
-      const newItem = await dataSource.add(item);
-      if (!subscriptions[key] && data[key]) {
-        setData((prev) => ({ ...prev, [key]: [...prev[key], newItem] }));
-      }
-      return newItem;
-    },
-    [getDataSource, subscriptions, data]
-  );
-
-  const update = useCallback(
-    async (key: string, data: any, id?: string) => {
-      const dataSource = getDataSource(key);
-      const newData = await dataSource.update(data, id);
-      if (!subscriptions[key] && data[key]) {
-        setData((prev) => ({
-          ...prev,
-          [key]: prev[key].map((item: any) =>
-            item.id === id && newData ? { ...item, ...(newData as object) } : item
-          ),
-        }));
-      }
-    },
-    [getDataSource, subscriptions]
-  );
-
-  const set = useCallback(
-    async (key: string, data: any, id?: string) => {
-      const dataSource = getDataSource(key);
-      await dataSource.set(data, id);
-      if (!subscriptions[key] && data[key]) {
-        setData((prev) => ({
-          ...prev,
-          [key]: prev[key].map((item: any) => (item.id === id ? { ...item, ...data } : item)),
-        }));
-      }
-    },
-    [getDataSource, subscriptions]
-  );
-
-  const remove = useCallback(
-    async (key: string, id?: string) => {
-      const dataSource = getDataSource(key);
-      await dataSource.delete(id);
-      if (!subscriptions[key] && data[key]) {
-        setData((prev) => ({
-          ...prev,
-          [key]: prev[key].filter((item: any) => item.id !== id),
-        }));
-      }
-    },
-    [getDataSource, subscriptions, data]
+    [getDataSource, queryClient, subscriptions]
   );
 
   useEffect(() => {
@@ -166,19 +60,9 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   return (
     <DataContext.Provider
       value={{
-        dataSources: dataSourcesState,
-        setDataSource,
-        addDataSource,
         data,
-        loading,
-        error,
-        fetchData,
         subscribeToData,
         subscriptions,
-        add,
-        update,
-        set,
-        remove,
       }}
     >
       {children}

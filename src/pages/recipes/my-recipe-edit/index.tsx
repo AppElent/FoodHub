@@ -1,5 +1,5 @@
 import useParamItem from '@/hooks/use-param-item';
-import { useData } from '@/libs/data-sources';
+import { useData } from '@/libs/data-sources-old';
 import DefaultPage from '@/pages/default/DefaultPage';
 import { Recipe } from '@/schemas/recipes/recipe';
 import RecipeEditCard from '@/sections/recipes/recipe-edit-card';

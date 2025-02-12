@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Open Foodhub met huidige URL",
+  "version": "1.0",
+  "description": "Haalt de huidige URL op en opent https://foodhub.appelent.nl/app/recipes/my/new?url=<URL> in een nieuw tabblad.",
+  "permissions": ["tabs", "activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon48.png"
+    }
+  }
+}

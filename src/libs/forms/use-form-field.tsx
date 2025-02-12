@@ -51,18 +51,10 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
     [field.name, helpers]
   );
 
-  // Translate label
-  const label = fieldConfig?.translationKey
-    ? t(fieldConfig?.translationKey, { defaultValue: fieldConfig?.label || name })
-    : fieldConfig?.label || name;
-  if (fieldConfig && label !== fieldConfig?.label) {
-    fieldConfig.label = label;
-  }
-
   // If meta.error is a string, return, otherwise translate the error
   let newError: any = meta.error;
   if (newError && !(typeof newError === 'string')) {
-    newError = t(newError?.key, { ...newError?.values, field: label });
+    newError = t(newError?.key, { ...newError?.values, field: fieldConfig?.label || name });
   }
   const newMeta = {
     ...meta,

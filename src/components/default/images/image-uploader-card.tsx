@@ -12,9 +12,9 @@ import {
   CardMedia,
   IconButton,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import { JSX, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ImageCropper from '../../../components/default/images/image-cropper';
 // import ImageCard from './image-card';
 
@@ -57,6 +57,7 @@ const ImageCard = ({
   showTitle = false,
   showUploadButton = true,
 }: ImageCardProps) => {
+  const { t } = useTranslation();
   const [cropperUrl, setCropperUrl] = useState<string | undefined>(undefined);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +90,7 @@ const ImageCard = ({
         >
           {showTitle && (
             <CardHeader
-              title="Image"
+              title={t('common:labels.image', { defaultValue: 'Image' })}
               titleTypographyProps={{ variant: 'h6' }}
             />
           )}
@@ -114,7 +115,7 @@ const ImageCard = ({
                 color: 'white',
               }}
             >
-              Upload Image
+              {t('common:actions.uploadImage', { defaultValue: 'Upload Image' })}
               <input
                 type="file"
                 accept="image/*"
@@ -166,7 +167,7 @@ const ImageCard = ({
               {/* Delete */}
               {!!remove && (
                 <Tooltip
-                  title={remove.label || 'Delete'}
+                  title={remove.label || t('common:actions.delete', { defaultValue: 'Delete' })}
                   placement="top"
                 >
                   <IconButton
@@ -206,6 +207,7 @@ const ImageCard = ({
 interface ImageUploaderCardProps {
   imageUrls: string | string[];
   onUpload: (files: File[]) => Promise<any>;
+  label?: string;
   size?: {
     width: number;
     height: number;
@@ -236,6 +238,7 @@ const ImageUploaderCard = ({
   favorite,
   remove,
 }: ImageUploaderCardProps) => {
+  const { t } = useTranslation();
   const multiple = Array.isArray(imageUrls);
   const urls = multiple ? imageUrls : [imageUrls];
 
@@ -251,12 +254,12 @@ const ImageUploaderCard = ({
 
   return (
     <Box>
-      <Typography
+      {/* <Typography
         variant="h6"
         gutterBottom
       >
-        Upload Image
-      </Typography>
+        {label}
+      </Typography> */}
 
       {/* Show upload button on top if multiple */}
       {multiple && (
@@ -266,7 +269,7 @@ const ImageUploaderCard = ({
           startIcon={<AddPhotoAlternateIcon />}
           // {...newProps?.muiButtonProps}
         >
-          Upload Images
+          {t('common:actions.uploadImages', { defaultValue: 'Upload images' })}
           <input
             type="file"
             accept="image/*"
